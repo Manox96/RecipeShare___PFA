@@ -273,12 +273,20 @@ def delete_photo(request, photo_id):
 
 @login_required(login_url='login')
 def favorite_photos(request):
-    photos = Photo.objects.filter(favorites=request.user, user=request.user).order_by('-upload_date')
-    favorites_count = Photo.objects.filter(favorites=request.user).count()
+    # Get all recipes that the user has favorited
+    recipes = Recipe.objects.filter(favorite__user=request.user).order_by('-created_at')
+    favorites_count = recipes.count()
+    
+    # Add pagination
+    paginator = Paginator(recipes, 9)  # Show 9 recipes per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'photos': photos,
-        'title': 'Mes Favoris',
+        'recipes': page_obj,
+        'title': 'Saved Recipes',
         'favorites_count': favorites_count,
+        'is_public': False,
     }
     return render(request, 'myapp/photo_list.html', context)
 

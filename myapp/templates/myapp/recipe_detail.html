@@ -253,9 +253,9 @@
     </a>
     
     {% if user.is_authenticated %}
-      <a href="{% url 'toggle_favorite_recipe' recipe.id %}" class="btn btn-favorite {% if user in recipe.favorited_by.all %}active{% endif %}">
-        <i class="bi {% if user in recipe.favorited_by.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
-        {% if user in recipe.favorited_by.all %}Remove from Favorites{% else %}Add to Favorites{% endif %}
+      <a href="{% url 'toggle_favorite_recipe' recipe.id %}" class="btn btn-favorite {% if recipe in user.favorite_set.all %}active{% endif %}">
+        <i class="bi {% if recipe in user.favorite_set.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+        {% if recipe in user.favorite_set.all %}Remove from Favorites{% else %}Add to Favorites{% endif %}
       </a>
       {% if user == recipe.user %}
         <a href="{% url 'update_recipe' recipe.id %}" class="btn btn-primary">
