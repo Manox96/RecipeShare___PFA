@@ -1,0 +1,545 @@
+{% extends 'myapp/layout.html' %}
+
+{% block main_content %}
+<div class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
+    <div class="row justify-content-center w-100">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-4">
+                    <h2 class="card-title mb-4 text-center">Upload New Recipe</h2>
+                    
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" id="recipeForm">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Recipe Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="id_title" class="form-label">Recipe Title</label>
+                                <input type="text" class="form-control form-control-lg" id="id_title" name="title" required>
+                                <div class="invalid-feedback">Please enter a recipe title.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_image" class="form-label">Recipe Image</label>
+                                <input type="file" class="form-control" id="id_image" name="image" accept="image/*">
+                                <small class="text-muted">Upload an image for your recipe</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="id_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="id_description" name="description" rows="3" required></textarea>
+                            <div class="invalid-feedback">Please provide a description.</div>
+                        </div>
+
+                        <!-- Recipe Details -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label for="id_difficulty" class="form-label">Difficulty</label>
+                                <select class="form-select" id="id_difficulty" name="difficulty" required>
+                                    <option value="">Select difficulty...</option>
+                                    {% for difficulty in difficulties %}
+                                        <option value="{{ difficulty.id }}">{{ difficulty.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a difficulty level.</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="id_cuisine" class="form-label">Cuisine</label>
+                                <select class="form-select" id="id_cuisine" name="cuisine">
+                                    <option value="">Select cuisine...</option>
+                                    {% for cuisine in cuisines %}
+                                        <option value="{{ cuisine.id }}">{{ cuisine.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="id_meal_type" class="form-label">Meal Type</label>
+                                <select class="form-select" id="id_meal_type" name="meal_type" required>
+                                    <option value="">Select meal type...</option>
+                                    {% for meal_type in meal_types %}
+                                        <option value="{{ meal_type.id }}">{{ meal_type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a meal type.</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="id_servings" class="form-label">Servings</label>
+                                <input type="number" class="form-control" id="id_servings" name="servings" min="1" required>
+                                <div class="invalid-feedback">Please enter the number of servings.</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="id_prep_time" class="form-label">Preparation Time (minutes)</label>
+                                <input type="number" class="form-control" id="id_prep_time" name="prep_time" min="1" required>
+                                <div class="invalid-feedback">Please enter preparation time.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_cook_time" class="form-label">Cooking Time (minutes)</label>
+                                <input type="number" class="form-control" id="id_cook_time" name="cook_time" min="1" required>
+                                <div class="invalid-feedback">Please enter cooking time.</div>
+                            </div>
+                        </div>
+
+                        <!-- Ingredients Section -->
+                        <div class="mb-4">
+                            <h4 class="mb-3">Ingredients</h4>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <button type="button" class="btn btn-secondary" id="add-ingredient">Add Ingredient</button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newIngredientModal">
+                                    <i class="bi bi-plus-circle"></i> Create New Ingredient
+                                </button>
+                            </div>
+                            {{ ingredient_formset.management_form }}
+                            <div id="ingredients-container">
+                                {% for form in ingredient_formset %}
+                                    <div class="row mb-2 ingredient-form">
+                                        <div class="col-md-4">
+                                            <select class="form-select" name="{{ form.ingredient.html_name }}" required>
+                                                <option value="">Select ingredient...</option>
+                                                {% for ingredient in ingredients %}
+                                                    <option value="{{ ingredient.id }}">{{ ingredient.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="invalid-feedback">Please select an ingredient.</div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" name="{{ form.quantity.html_name }}" placeholder="Quantity" required>
+                                            <div class="invalid-feedback">Please enter quantity.</div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" name="{{ form.unit.html_name }}" required>
+                                                <option value="">Select unit...</option>
+                                                {% for unit in units %}
+                                                    <option value="{{ unit.id }}">{{ unit.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="invalid-feedback">Please select a unit.</div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-danger remove-ingredient">Remove</button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Steps Section -->
+                        <div class="mb-4">
+                            <h4 class="mb-3">Cooking Steps</h4>
+                            {{ step_formset.management_form }}
+                            <div id="steps-container">
+                                {% for form in step_formset %}
+                                    <div class="row mb-2 step-form">
+                                        <div class="col-md-1">
+                                            <input type="number" class="form-control" name="{{ form.step_number.html_name }}" value="{{ forloop.counter }}" readonly>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <textarea class="form-control" name="{{ form.instruction.html_name }}" rows="2" required></textarea>
+                                            <div class="invalid-feedback">Please enter step instructions.</div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-danger remove-step">Remove</button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-secondary mt-2" id="add-step">Add Step</button>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="bi bi-cloud-upload me-2"></i>Upload Recipe
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Ingredient Modal -->
+<div class="modal fade" id="newIngredientModal" tabindex="-1" aria-labelledby="newIngredientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newIngredientModalLabel">Create New Ingredient</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newIngredientForm">
+                    <div class="mb-3">
+                        <label for="ingredientName" class="form-label">Ingredient Name</label>
+                        <input type="text" class="form-control" id="ingredientName" required>
+                        <div class="invalid-feedback">Please enter an ingredient name.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveNewIngredient">Save Ingredient</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('recipeForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const addStepBtn = document.getElementById('add-step');
+    const addIngredientBtn = document.getElementById('add-ingredient');
+    const stepsContainer = document.getElementById('steps-container');
+    const ingredientsContainer = document.getElementById('ingredients-container');
+    const totalForms = document.getElementById('id_steps-TOTAL_FORMS');
+    const totalIngredientForms = document.getElementById('id_ingredients-TOTAL_FORMS');
+    const newIngredientModal = new bootstrap.Modal(document.getElementById('newIngredientModal'));
+    const newIngredientForm = document.getElementById('newIngredientForm');
+    const saveNewIngredientBtn = document.getElementById('saveNewIngredient');
+
+    // Function to create new ingredient
+    async function createNewIngredient(name) {
+        try {
+            const response = await fetch('/ingredient/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: `name=${encodeURIComponent(name)}`
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Add the new ingredient to all ingredient selects
+                const ingredientSelects = document.querySelectorAll('select[name*="ingredient"]');
+                ingredientSelects.forEach(select => {
+                    const option = new Option(data.ingredient.name, data.ingredient.id);
+                    select.add(option);
+                });
+                
+                // Show success message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                document.querySelector('.messages').appendChild(alertDiv);
+                
+                // Close the modal and reset the form
+                newIngredientModal.hide();
+                newIngredientForm.reset();
+                
+                // Select the new ingredient in the last ingredient form
+                const lastIngredientForm = document.querySelector('.ingredient-form:last-child');
+                if (lastIngredientForm) {
+                    const select = lastIngredientForm.querySelector('select[name*="ingredient"]');
+                    select.value = data.ingredient.id;
+                }
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            // Show error message
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                ${error.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.querySelector('.messages').appendChild(alertDiv);
+        }
+    }
+
+    // Handle save new ingredient button click
+    saveNewIngredientBtn.addEventListener('click', function() {
+        const nameInput = document.getElementById('ingredientName');
+        const name = nameInput.value.trim();
+        
+        if (!name) {
+            nameInput.classList.add('is-invalid');
+            return;
+        }
+        
+        nameInput.classList.remove('is-invalid');
+        createNewIngredient(name);
+    });
+
+    // Function to add new ingredient
+    function addIngredient() {
+        const ingredientForms = document.querySelectorAll('.ingredient-form');
+        const formNum = ingredientForms.length;
+        const newIngredient = ingredientForms[0].cloneNode(true);
+        
+        // Clear the values
+        const selects = newIngredient.querySelectorAll('select');
+        const inputs = newIngredient.querySelectorAll('input');
+        
+        selects.forEach(select => {
+            select.value = '';
+            select.classList.remove('is-invalid');
+        });
+        
+        inputs.forEach(input => {
+            input.value = '';
+            input.classList.remove('is-invalid');
+        });
+        
+        // Update the form index
+        const regex = new RegExp(`(${formNum - 1})`, 'g');
+        newIngredient.innerHTML = newIngredient.innerHTML.replace(regex, formNum);
+        
+        // Add remove button functionality
+        const removeBtn = newIngredient.querySelector('.remove-ingredient');
+        removeBtn.addEventListener('click', function() {
+            newIngredient.remove();
+            updateTotalIngredientForms();
+        });
+        
+        ingredientsContainer.appendChild(newIngredient);
+        updateTotalIngredientForms();
+    }
+
+    // Function to update total ingredient forms count
+    function updateTotalIngredientForms() {
+        const ingredientForms = document.querySelectorAll('.ingredient-form');
+        totalIngredientForms.value = ingredientForms.length;
+    }
+
+    // Add click event listener to add ingredient button
+    addIngredientBtn.addEventListener('click', addIngredient);
+
+    // Add remove functionality to existing ingredient forms
+    document.querySelectorAll('.remove-ingredient').forEach(button => {
+        button.addEventListener('click', function() {
+            const ingredientForm = this.closest('.ingredient-form');
+            ingredientForm.remove();
+            updateTotalIngredientForms();
+        });
+    });
+
+    // Function to add new step
+    function addStep() {
+        const stepForms = document.querySelectorAll('.step-form');
+        const formNum = stepForms.length;
+        const newStep = stepForms[0].cloneNode(true);
+        
+        // Update the step number
+        const stepNumberInput = newStep.querySelector('input[type="number"]');
+        stepNumberInput.value = formNum + 1;
+        
+        // Clear the instruction textarea
+        const instructionTextarea = newStep.querySelector('textarea');
+        instructionTextarea.value = '';
+        
+        // Update the form index
+        const regex = new RegExp(`(${formNum - 1})`, 'g');
+        newStep.innerHTML = newStep.innerHTML.replace(regex, formNum);
+        
+        // Add remove button functionality
+        const removeBtn = newStep.querySelector('.remove-step');
+        removeBtn.addEventListener('click', function() {
+            newStep.remove();
+            updateStepNumbers();
+            updateTotalForms();
+        });
+        
+        stepsContainer.appendChild(newStep);
+        updateTotalForms();
+    }
+
+    // Function to update step numbers
+    function updateStepNumbers() {
+        const stepForms = document.querySelectorAll('.step-form');
+        stepForms.forEach((form, index) => {
+            const stepNumberInput = form.querySelector('input[type="number"]');
+            stepNumberInput.value = index + 1;
+        });
+    }
+
+    // Function to update total forms count
+    function updateTotalForms() {
+        const stepForms = document.querySelectorAll('.step-form');
+        totalForms.value = stepForms.length;
+    }
+
+    // Add click event listener to add step button
+    addStepBtn.addEventListener('click', addStep);
+
+    // Add remove functionality to existing step forms
+    document.querySelectorAll('.remove-step').forEach(button => {
+        button.addEventListener('click', function() {
+            const stepForm = this.closest('.step-form');
+            stepForm.remove();
+            updateStepNumbers();
+            updateTotalForms();
+        });
+    });
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Remove any existing validation classes
+        form.classList.remove('was-validated');
+        
+        // Check if the form is valid
+        if (!form.checkValidity()) {
+            event.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        // Check if there's at least one ingredient
+        const ingredients = document.querySelectorAll('.ingredient-form');
+        if (ingredients.length === 0) {
+            alert('Please add at least one ingredient.');
+            return;
+        }
+        
+        // Check if there's at least one step
+        const steps = document.querySelectorAll('.step-form');
+        if (steps.length === 0) {
+            alert('Please add at least one cooking step.');
+            return;
+        }
+        
+        // Validate all ingredient forms
+        let ingredientsValid = true;
+        ingredients.forEach(ingredient => {
+            const selects = ingredient.querySelectorAll('select');
+            const inputs = ingredient.querySelectorAll('input');
+            
+            selects.forEach(select => {
+                if (!select.value) {
+                    select.classList.add('is-invalid');
+                    ingredientsValid = false;
+                } else {
+                    select.classList.remove('is-invalid');
+                }
+            });
+            
+            inputs.forEach(input => {
+                if (!input.value) {
+                    input.classList.add('is-invalid');
+                    ingredientsValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+        });
+        
+        if (!ingredientsValid) {
+            alert('Please fill in all ingredient details.');
+            return;
+        }
+        
+        // Validate all step forms
+        let stepsValid = true;
+        steps.forEach(step => {
+            const textarea = step.querySelector('textarea');
+            if (!textarea.value.trim()) {
+                textarea.classList.add('is-invalid');
+                stepsValid = false;
+            } else {
+                textarea.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!stepsValid) {
+            alert('Please fill in all step instructions.');
+            return;
+        }
+        
+        // If everything is valid, submit the form
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...';
+        form.submit();
+    });
+});
+</script>
+
+<style>
+    .card {
+        background: #fff;
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    }
+    
+    .form-control, .form-select {
+        border-radius: 1rem;
+        padding: 0.8rem 1.2rem;
+        border: 1px solid rgba(0,0,0,0.1);
+        font-size: 1rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #f7b32b;
+        box-shadow: 0 0 0 0.25rem rgba(247, 179, 43, 0.25);
+    }
+    
+    .btn-primary {
+        background: #f7b32b;
+        border: none;
+        border-radius: 1.2rem;
+        padding: 1rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+        background: #e6a31f;
+        transform: translateY(-2px);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #18181b;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-danger {
+        border-radius: 0.8rem;
+    }
+
+    .btn-secondary {
+        border-radius: 0.8rem;
+        background: #f8f6f2;
+        color: #18181b;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background: #eee;
+    }
+
+    .alert {
+        border-radius: 1rem;
+        border: none;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %} 

@@ -1,0 +1,212 @@
+{% extends 'myapp/layout.html' %}
+
+{% block title %}Recipe Share - Home{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block main_content %}
+<style>
+  body, .main-content {
+    background: #f8f6f2 !important;
+  }
+  .hero-banner {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 4px 24px 0 rgba(60,60,120,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2.5rem 3rem;
+    margin-bottom: 2.5rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .hero-text h1 {
+    font-size: 2.7rem;
+    font-weight: 800;
+    color: #222;
+    margin-bottom: 0.5rem;
+  }
+  .hero-text span {
+    color: #f7b32b;
+    font-weight: 800;
+  }
+  .hero-text p {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 0;
+  }
+  .hero-img {
+    max-width: 320px;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .hero-img img {
+    width: 100%;
+    border-radius: 1.5rem;
+    display: block;
+  }
+  .filter-section {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .filter-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 1.2rem;
+  }
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    justify-content: center;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    background: #fff;
+    color: #222;
+    border-radius: 2rem;
+    padding: 0.5rem 1.3rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 1.5px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+  }
+  .chip.active, .chip:hover {
+    background: #18181b;
+    color: #fff;
+    border: 1.5px solid #f7b32b;
+  }
+  .recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  .recipe-card {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 16px 0 rgba(60,60,120,0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, transform 0.2s;
+    border: none;
+  }
+  .recipe-card:hover {
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.13);
+    transform: translateY(-4px) scale(1.02);
+  }
+  .recipe-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #f8f6f2;
+  }
+  .recipe-content {
+    padding: 1.3rem 1.3rem 1rem 1.3rem;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .recipe-title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #18181b;
+    margin-bottom: 0.7rem;
+    min-height: 48px;
+  }
+  .recipe-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #888;
+    font-size: 0.98rem;
+    margin-bottom: 0.7rem;
+  }
+  .recipe-meta i {
+    color: #f7b32b;
+    margin-right: 0.2rem;
+  }
+  .see-recipe-btn {
+    background: #18181b;
+    color: #fff;
+    border: none;
+    border-radius: 1.2rem;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: auto;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .see-recipe-btn:hover {
+    background: #f7b32b;
+    color: #18181b;
+  }
+</style>
+
+<div class="hero-banner mb-5">
+  <div class="hero-text">
+    <h1>Explore <span>Culinary</span> Insights</h1>
+    <p>Discover, share, and cook amazing recipes from around the world. Find your next favorite dish!</p>
+  </div>
+  <div class="hero-img d-none d-md-block">
+    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Delicious food">
+  </div>
+</div>
+
+<div class="filter-section">
+  <h2>What to <span style="color:#f7b32b">Cook</span>?</h2>
+  <div class="filter-chips">
+    <span class="chip active"><i class="bi bi-stars me-1"></i>All Types</span>
+    <span class="chip"><i class="bi bi-egg-fried me-1"></i>Appetizers</span>
+    <span class="chip"><i class="bi bi-restaurant me-1"></i>Main Courses</span>
+    <span class="chip"><i class="bi bi-emoji-smile me-1"></i>Salads & Sides</span>
+    <span class="chip"><i class="bi bi-emoji-laughing me-1"></i>Vegetarian Delights</span>
+    <span class="chip"><i class="bi bi-globe me-1"></i>International Flavors</span>
+    <span class="chip"><i class="bi bi-cup-straw me-1"></i>Desserts & Sweets</span>
+    <span class="chip"><i class="bi bi-heart-pulse me-1"></i>Healthy Eats</span>
+    <span class="chip"><i class="bi bi-lightning me-1"></i>Quick & Easy Supper</span>
+  </div>
+</div>
+
+<div class="recipes-grid">
+  {% for recipe in recipes %}
+  <div class="recipe-card">
+    {% if recipe.image %}
+      <img src="{{ recipe.image.url }}" class="recipe-img" alt="{{ recipe.title }}">
+    {% else %}
+      <div class="recipe-img d-flex align-items-center justify-content-center" style="height:200px;">
+        <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
+      </div>
+    {% endif %}
+    <div class="recipe-content">
+      <div class="recipe-title">{{ recipe.title }}</div>
+      <div class="recipe-meta">
+        <span><i class="bi bi-eye"></i> {{ recipe.views|default:0 }}</span>
+        <span><i class="bi bi-clock"></i> {{ recipe.created_at|timesince }}</span>
+      </div>
+      <a href="{% url 'recipe_detail' recipe.id %}" class="see-recipe-btn">
+        See Complete Recipe <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="text-center py-5">
+      <i class="bi bi-emoji-smile text-muted" style="font-size: 3rem;"></i>
+      <p class="text-muted mt-3">No recipes available yet. Be the first to share your recipe!</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %} 

@@ -1,0 +1,156 @@
+{% extends 'myapp/layout.html' %}
+
+{% block title %}Register - Photo Gallery{% endblock %}
+
+{% block main_content %}
+<style>
+  body, .bg-auth {
+    background: #f6f7fa !important;
+  }
+  .auth-outer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f6f7fa;
+  }
+  .auth-form-card {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 3rem 2.5rem 2.5rem 2.5rem;
+    width: 100%;
+    max-width: 450px;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .auth-form-card h2 {
+    font-weight: 800;
+    font-size: 2.1rem;
+    margin-bottom: 2rem;
+    letter-spacing: -1px;
+    color: #18181b;
+    text-align: center;
+  }
+  .form-label {
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 0.25rem;
+  }
+  .form-control {
+    border-radius: 0.9rem;
+    border: 1px solid #e5e7eb;
+    background: #f8f9fb;
+    font-size: 1.08rem;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.1rem;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .form-control:focus {
+    border-color: #a5b4fc;
+    box-shadow: 0 0 0 2px #e0e7ff;
+    background: #fff;
+  }
+  .btn-dark {
+    background: #18181b;
+    border: none;
+    border-radius: 1.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    padding: 0.85rem 0;
+    margin-top: 0.2rem;
+    margin-bottom: 0.7rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  .btn-dark:hover, .btn-dark:focus {
+    background: #232326;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  }
+  .social-btn {
+    border: 1px solid #e5e7eb;
+    border-radius: 2rem;
+    padding: 0.55rem 1.3rem;
+    margin: 0 0.3rem;
+    background: #fff;
+    color: #222;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.05rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    transition: box-shadow 0.2s, border 0.2s;
+  }
+  .social-btn:hover, .social-btn:focus {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #a5b4fc;
+    text-decoration: none;
+  }
+  .divider {
+    text-align: center;
+    margin: 1.5rem 0 1.2rem 0;
+    color: #d1d5db;
+    font-size: 1rem;
+    position: relative;
+    letter-spacing: 0.5px;
+    font-weight: 400;
+  }
+  .divider:before, .divider:after {
+    content: '';
+    display: inline-block;
+    width: 38%;
+    height: 1px;
+    background: #ececec;
+    vertical-align: middle;
+    margin: 0 0.5rem;
+  }
+  .text-muted {
+    color: #888 !important;
+    font-size: 1rem;
+  }
+  @media (max-width: 700px) {
+    .auth-form-card {
+      margin: 1rem;
+      padding: 2rem 1.5rem;
+      border-radius: 1.5rem;
+    }
+  }
+</style>
+<div class="auth-outer">
+  <div class="auth-form-card">
+    <h2>Create Account</h2>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <form method="post" autocomplete="on">
+      {% csrf_token %}
+      <label for="username" class="form-label">Username</label>
+      <input type="text" class="form-control" id="username" name="username" required autocomplete="username">
+      
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" name="email" required autocomplete="email">
+      
+      <label for="password1" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password1" name="password1" required autocomplete="new-password">
+      
+      <label for="password2" class="form-label">Confirm Password</label>
+      <input type="password" class="form-control" id="password2" name="password2" required autocomplete="new-password">
+      
+      <button type="submit" class="btn btn-dark btn-lg w-100 mb-2" aria-label="Create Account">
+        <i class="bi bi-person-plus me-2"></i>Create Account
+      </button>
+    </form>
+    <div class="text-center mt-2 mb-2">
+      <span class="text-muted">Already have an account? <a href="{% url 'login' %}">Login here</a></span>
+    </div>
+  </div>
+</div>
+{% endblock %} 

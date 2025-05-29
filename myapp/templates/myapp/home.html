@@ -1,0 +1,113 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}{{ title }} - Photo Gallery{% endblock %}
+
+{% block content %}
+<style>
+  body, .bg-auth {
+    background: #f6f7fa !important;
+  }
+  .home-outer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f6f7fa;
+  }
+  .home-card {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 2.5rem 2rem 2rem 2rem;
+    width: 100%;
+    max-width: 1100px;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .home-card h2 {
+    font-weight: 800;
+    font-size: 2.1rem;
+    margin-bottom: 2rem;
+    letter-spacing: -1px;
+    color: #18181b;
+    text-align: center;
+  }
+  .row {
+    margin: 0;
+  }
+  @media (max-width: 900px) {
+    .home-card {
+      max-width: 98vw;
+      padding: 2rem 1rem 1.5rem 1rem;
+    }
+  }
+</style>
+<div class="home-outer">
+  <div class="home-card">
+    <h2>Galerie photo</h2>
+    <form class="d-flex justify-content-center mb-4" role="search">
+      <input class="form-control w-50" type="search" placeholder="Search Photos" aria-label="Search">
+    </form>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {% if photos %}
+        {% for photo in photos %}
+          <div class="col">
+            <div class="card shadow-sm rounded-4 h-100 border-0 position-relative overflow-hidden photo-card-hover">
+              {% if photo.image %}
+                <img src="{{ photo.image.url }}" class="card-img-top rounded-top-4" alt="{{ photo.Nom }}" style="height: 200px; object-fit: cover;">
+                <div class="position-absolute top-0 end-0 m-2 bg-white bg-opacity-75 rounded-circle p-2">
+                  <i class="bi bi-image text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+              {% else %}
+                <div class="card-img-top bg-light text-center py-5 rounded-top-4" style="height: 200px;">
+                  <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                  <p class="text-muted mt-2">Pas d'image</p>
+                </div>
+              {% endif %}
+              <div class="card-body">
+                <h5 class="card-title text-truncate">{{ photo.Nom }}</h5>
+                <p class="card-text small text-truncate">{{ photo.Descreption|truncatewords:10 }}</p>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                  <a href="{% url 'photo_detail' photo.id %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-eye"></i> Voir
+                  </a>
+                  <span class="text-muted small">{{ photo.upload_date|date:"d/m/Y" }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12">
+          <div class="alert alert-info">
+            Aucune photo n'est disponible pour le moment. Ajoutez votre première photo!
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<style>
+  .photo-card-hover:hover {
+    box-shadow: 0 8px 32px rgba(80, 80, 180, 0.18) !important;
+    transform: translateY(-4px) scale(1.03);
+    transition: all 0.2s;
+  }
+  .card-img-top {
+    transition: filter 0.2s;
+  }
+  .photo-card-hover:hover .card-img-top {
+    filter: brightness(0.92) blur(1px);
+  }
+</style>
+{% endblock %} 

@@ -1,0 +1,100 @@
+{% extends 'myapp/layout.html' %}
+
+{% block title %}Edit User - Admin Dashboard{% endblock %}
+
+{% block main_content %}
+<style>
+  .edit-user-card {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 2.5rem;
+    margin: 2rem auto;
+    max-width: 600px;
+  }
+  .edit-user-card h2 {
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: #18181b;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .form-label {
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 0.5rem;
+  }
+  .form-control {
+    border-radius: 0.9rem;
+    border: 1px solid #e5e7eb;
+    background: #f8f9fb;
+    font-size: 1.08rem;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.1rem;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .form-control:focus {
+    border-color: #a5b4fc;
+    box-shadow: 0 0 0 2px #e0e7ff;
+    background: #fff;
+  }
+  .form-check {
+    margin-bottom: 1rem;
+  }
+  .btn-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+</style>
+
+<div class="edit-user-card">
+  <h2>
+    <i class="bi bi-person-gear"></i>
+    Edit User
+  </h2>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">New Password (leave blank to keep current)</label>
+      <input type="password" class="form-control" id="password" name="password">
+    </div>
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="is_staff" name="is_staff" {% if user.is_staff %}checked{% endif %}>
+      <label class="form-check-label" for="is_staff">Admin privileges</label>
+    </div>
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if user.is_active %}checked{% endif %}>
+      <label class="form-check-label" for="is_active">Active account</label>
+    </div>
+    <div class="btn-group">
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Save Changes
+      </button>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+        <i class="bi bi-x-lg"></i> Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %} 

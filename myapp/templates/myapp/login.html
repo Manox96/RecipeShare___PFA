@@ -1,0 +1,152 @@
+{% extends 'myapp/layout.html' %}
+
+{% block title %}Login - RecipeShare{% endblock %}
+
+{% block main_content %}
+<style>
+  body, .bg-auth {
+    background: #f8f6f2 !important;
+  }
+  .auth-outer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f6f2;
+  }
+  .auth-card {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 2.5rem 2.2rem 2rem 2.2rem;
+    width: 100%;
+    max-width: 370px;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .auth-card .login-icon {
+    font-size: 2.5rem;
+    color: #f7b32b;
+    margin-bottom: 0.7rem;
+  }
+  .auth-card h2 {
+    font-weight: 900;
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+    letter-spacing: -1px;
+    color: #18181b;
+    text-align: center;
+  }
+  .auth-card .subtitle {
+    color: #888;
+    font-size: 1.08rem;
+    margin-bottom: 1.7rem;
+    text-align: center;
+  }
+  .form-label {
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 0.25rem;
+  }
+  .form-control {
+    border-radius: 1.1rem;
+    border: 1.5px solid #eee;
+    background: #f8f9fb;
+    font-size: 1.08rem;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.1rem;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .form-control:focus {
+    border-color: #f7b32b;
+    box-shadow: 0 0 0 2px #f7b32b33;
+    background: #fff;
+  }
+  .btn-login {
+    background: #18181b;
+    color: #fff;
+    border: none;
+    border-radius: 1.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    padding: 0.85rem 0;
+    margin-top: 0.2rem;
+    margin-bottom: 0.7rem;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  .btn-login:hover, .btn-login:focus {
+    background: #f7b32b;
+    color: #18181b;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  }
+  .auth-links {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+  }
+  .auth-links a {
+    color: #f7b32b;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+  .auth-links a:hover {
+    color: #18181b;
+    text-decoration: underline;
+  }
+  .divider {
+    text-align: center;
+    margin: 1.5rem 0 1.2rem 0;
+    color: #d1d5db;
+    font-size: 1rem;
+    position: relative;
+    letter-spacing: 0.5px;
+    font-weight: 400;
+  }
+  .divider:before, .divider:after {
+    content: '';
+    display: inline-block;
+    width: 38%;
+    height: 1px;
+    background: #ececec;
+    vertical-align: middle;
+    margin: 0 0.5rem;
+  }
+  @media (max-width: 600px) {
+    .auth-card {
+      padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+      border-radius: 1.2rem;
+    }
+  }
+</style>
+<div class="auth-outer">
+  <div class="auth-card">
+    <div class="login-icon mb-2"><i class="bi bi-person-circle"></i></div>
+    <h2>Welcome Back</h2>
+    <div class="subtitle">Sign in to your RecipeShare account</div>
+    <form method="post" autocomplete="on" style="width:100%;">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="id_username" class="form-label">Username</label>
+        <input type="text" name="username" autofocus required maxlength="150" class="form-control" id="id_username" placeholder="Enter your username">
+      </div>
+      <div class="mb-3">
+        <label for="id_password" class="form-label">Password</label>
+        <input type="password" name="password" required class="form-control" id="id_password" placeholder="Enter your password">
+      </div>
+      <button type="submit" class="btn-login">Login</button>
+    </form>
+    <div class="auth-links mt-2">
+      <a href="{% url 'register' %}">Create account</a>
+      <a href="#">Forgot password?</a>
+    </div>
+  </div>
+</div>
+{% endblock %} 

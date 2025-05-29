@@ -1,0 +1,48 @@
+{% extends 'myapp/layout.html' %}
+
+{% block title %}{{ title }} - Photo Gallery{% endblock %}
+
+{% block page_title %}À Propos{% endblock %}
+
+{% block main_content %}
+<style>
+  .about-card {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 2.5rem 2rem 2rem 2rem;
+    max-width: 800px;
+    margin: 2rem auto;
+  }
+  .about-card h2 {
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: #18181b;
+    margin-top: 2rem;
+  }
+  .about-card p.lead {
+    font-size: 1.1rem;
+    color: #444;
+    margin-bottom: 1.5rem;
+  }
+  .about-card p {
+    color: #444;
+    font-size: 1rem;
+  }
+</style>
+<div class="about-card">
+  <h2 class="mb-4">À Propos</h2>
+  <p class="lead">{{ description }}</p>
+  <h2>Notre mission</h2>
+  <p>
+    Notre mission est de permettre aux photographes amateurs et professionnels 
+    de partager leurs œuvres avec le monde entier. Nous croyons que chaque image 
+    raconte une histoire unique qui mérite d'être partagée.
+  </p>
+  <h2>Notre équipe</h2>
+  <p>
+    Notre équipe est composée de passionnés de photographie et de développeurs web 
+    dévoués à créer la meilleure expérience possible pour nos utilisateurs.
+  </p>
+</div>
+{% endblock %} 
