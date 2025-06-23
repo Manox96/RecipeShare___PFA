@@ -505,10 +505,10 @@
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link {% if request.resolver_match.url_name == 'upload_photo' %}active{% endif %}" href="{% url 'upload_photo' %}">
-            <i class="bi bi-cloud-upload me-2"></i> Upload Recipe
+          <a class="nav-link {% if request.resolver_match.url_name == 'create_recipe' %}active{% endif %}" href="{% url 'create_recipe' %}">
+            <i class="bi bi-plus-circle"></i> Add Recipe
           </a>
-        </li> 
+        </li>
         <li class="nav-item mb-2">
           <a class="nav-link {% if request.resolver_match.url_name == 'favorite_photos' %}active{% endif %}" href="{% url 'favorite_photos' %}">
             <i class="bi bi-heart me-2"></i> Saved Recipes
@@ -520,6 +520,12 @@
       <nav class="nav flex-column mt-4">
         <a class="nav-link {% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}" href="{% url 'manage_users' %}">
           <i class="bi bi-people-fill"></i> Manage Users
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'manage_tags' %}active{% endif %}" href="{% url 'manage_tags' %}">
+          <i class="bi bi-tags-fill"></i> Manage Tags
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'manage_ingredients' %}active{% endif %}" href="{% url 'manage_ingredients' %}">
+          <i class="bi bi-basket-fill"></i> Manage Ingredients
         </a>
         <a class="nav-link {% if request.resolver_match.url_name == 'blog_list' %}active{% endif %}" href="{% url 'blog_list' %}">
           <i class="bi bi-journal-text"></i> Blog

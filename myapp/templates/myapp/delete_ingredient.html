@@ -1,0 +1,13 @@
+{% extends 'myapp/layout.html' %}
+{% block title %}Delete Ingredient{% endblock %}
+{% block main_content %}
+<div class="manage-ingredients-container">
+  <h2 class="mb-4 text-danger"><i class="bi bi-trash me-2"></i>Delete Ingredient</h2>
+  <p>Are you sure you want to delete the ingredient <strong>{{ ingredient.name }}</strong>?</p>
+  <form method="post" class="d-inline">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit"><i class="bi bi-trash"></i> Delete</button>
+    <a href="{% url 'manage_ingredients' %}" class="btn btn-secondary ms-2"><i class="bi bi-x-lg"></i> Cancel</a>
+  </form>
+</div>
+{% endblock %} 

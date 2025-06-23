@@ -62,16 +62,21 @@ class RecipeIngredientForm(forms.ModelForm):
         model = RecipeIngredient
         fields = ['ingredient', 'unit', 'quantity']
         widgets = {
-            'ingredient': forms.Select(attrs={'class': 'form-select', 'required': True}),
-            'unit': forms.Select(attrs={'class': 'form-select', 'required': True}),
+            'ingredient': forms.Select(attrs={'class': 'form-select'}),
+            'unit': forms.Select(attrs={'class': 'form-select'}),
             'quantity': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'step': '0.01',
                 'min': '0',
-                'required': True
+                'placeholder': 'e.g., 2.5',
             }),
         }
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['ingredient'].empty_label = "Select ingredient..."
+        self.fields['unit'].empty_label = "Select unit..."
+
     def clean(self):
         cleaned_data = super().clean()
         quantity = cleaned_data.get('quantity')
@@ -86,8 +91,12 @@ class StepForm(forms.ModelForm):
         model = Step
         fields = ['step_number', 'instruction']
         widgets = {
-            'step_number': forms.NumberInput(attrs={'class': 'form-control', 'readonly': True}),
-            'instruction': forms.Textarea(attrs={'rows': 2, 'class': 'form-control', 'required': True}),
+            'step_number': forms.HiddenInput(),
+            'instruction': forms.Textarea(attrs={
+                'rows': 2, 
+                'class': 'form-control', 
+                'placeholder': 'e.g., Mix flour and eggs...'
+            }),
         }
 
 RecipeIngredientFormSet = forms.inlineformset_factory(

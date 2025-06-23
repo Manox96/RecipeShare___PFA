@@ -1,0 +1,16 @@
+{% extends 'myapp/layout.html' %}
+{% block title %}Edit Tag{% endblock %}
+{% block main_content %}
+<div class="manage-tags-container">
+  <h2 class="mb-4"><i class="bi bi-tags-fill me-2" style="color: #f7b32b;"></i>Edit Tag</h2>
+  <form method="post" class="mb-4" style="max-width: 400px;">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="tagName" class="form-label">Tag Name</label>
+      <input type="text" id="tagName" name="name" class="form-control" value="{{ tag.name }}" required>
+    </div>
+    <button class="btn btn-primary" type="submit"><i class="bi bi-save"></i> Save Changes</button>
+    <a href="{% url 'manage_tags' %}" class="btn btn-secondary ms-2"><i class="bi bi-x-lg"></i> Cancel</a>
+  </form>
+</div>
+{% endblock %} 

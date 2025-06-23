@@ -15,6 +15,7 @@ import datetime
 import pycountry
 import country_converter as coco
 from django.db.models import Q
+from django.contrib.admin.views.decorators import staff_member_required
 
 # Home view with integrated upload form
 @login_required(login_url='login')
@@ -150,83 +151,50 @@ class PhotoDetailView(DetailView):
 
 # Photo upload view
 @login_required(login_url='login')
-def upload_photo(request):
+def create_recipe(request):
     if request.method == 'POST':
         form = RecipeForm(request.POST, request.FILES)
         ingredient_formset = RecipeIngredientFormSet(request.POST, prefix='ingredients')
         step_formset = StepFormSet(request.POST, prefix='steps')
-        
-        # First validate the main form
-        if form.is_valid():
-            try:
-                # Create the recipe first
-                recipe = form.save(commit=False)
-                recipe.user = request.user
-                recipe.save()
-                form.save_m2m()  # Save tags
-                
-                # Now validate and save ingredients
-                ingredient_formset.instance = recipe
-                if ingredient_formset.is_valid():
-                    ingredient_formset.save()
-                else:
-                    recipe.delete()  # Clean up if ingredients are invalid
-                    for error in ingredient_formset.non_form_errors():
-                        messages.error(request, f'Ingredient error: {error}')
-                    for form in ingredient_formset.forms:
-                        for field, errors in form.errors.items():
-                            for error in errors:
-                                messages.error(request, f'Ingredient {form.instance.id or "new"}: {field} - {error}')
-                    return render(request, 'myapp/upload_photo.html', {
-                        'form': form,
-                        'ingredient_formset': ingredient_formset,
-                        'step_formset': step_formset,
-                        'difficulties': Difficulty.objects.all(),
-                        'cuisines': Cuisine.objects.all(),
-                        'meal_types': MealType.objects.all(),
-                        'ingredients': Ingredient.objects.all(),
-                        'units': Unit.objects.all(),
-                        'tags': Tag.objects.all(),
-                    })
-                
-                # Finally validate and save steps
-                step_formset.instance = recipe
-                if step_formset.is_valid():
-                    step_formset.save()
-                    messages.success(request, 'Recipe created successfully!')
-                    return redirect('photo_list')
-                else:
-                    recipe.delete()  # Clean up if steps are invalid
-                    for error in step_formset.non_form_errors():
-                        messages.error(request, f'Step error: {error}')
-                    for form in step_formset.forms:
-                        for field, errors in form.errors.items():
-                            for error in errors:
-                                messages.error(request, f'Step {form.instance.id or "new"}: {field} - {error}')
-                    return render(request, 'myapp/upload_photo.html', {
-                        'form': form,
-                        'ingredient_formset': ingredient_formset,
-                        'step_formset': step_formset,
-                        'difficulties': Difficulty.objects.all(),
-                        'cuisines': Cuisine.objects.all(),
-                        'meal_types': MealType.objects.all(),
-                        'ingredients': Ingredient.objects.all(),
-                        'units': Unit.objects.all(),
-                        'tags': Tag.objects.all(),
-                    })
-            except Exception as e:
-                messages.error(request, f'Error saving recipe: {str(e)}')
+
+        if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
+            recipe = form.save(commit=False)
+            recipe.user = request.user
+            recipe.save()
+            form.save_m2m()  # Save tags
+
+            ingredient_formset.instance = recipe
+            ingredient_formset.save()
+
+            step_formset.instance = recipe
+            step_formset.save()
+            
+            messages.success(request, 'Recipe created successfully!')
+            return redirect('photo_list')
         else:
-            # Show form validation errors
+            # Add form errors to messages for visibility
             for field, errors in form.errors.items():
                 for error in errors:
-                    messages.error(request, f'{field}: {error}')
+                    messages.error(request, f'{field.capitalize()}: {error}')
+            # Add ingredient formset errors
+            for formset_form in ingredient_formset:
+                for field, errors in formset_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f'Ingredient - {field.capitalize()}: {error}')
+            for error in ingredient_formset.non_form_errors():
+                messages.error(request, f'Ingredient (General): {error}')
+            # Add step formset errors
+            for formset_form in step_formset:
+                for field, errors in formset_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f'Step - {field.capitalize()}: {error}')
+            for error in step_formset.non_form_errors():
+                messages.error(request, f'Step (General): {error}')
     else:
         form = RecipeForm()
         ingredient_formset = RecipeIngredientFormSet(prefix='ingredients')
         step_formset = StepFormSet(prefix='steps')
     
-    # Get all the necessary data for dropdowns
     context = {
         'form': form,
         'ingredient_formset': ingredient_formset,
@@ -237,9 +205,9 @@ def upload_photo(request):
         'ingredients': Ingredient.objects.all(),
         'units': Unit.objects.all(),
         'tags': Tag.objects.all(),
-        'title': 'Upload New Recipe',  # Add title to context
+        'title': 'Upload New Recipe',
     }
-    return render(request, 'myapp/upload_photo.html', context)
+    return render(request, 'myapp/create_recipe.html', context)
 
 @login_required(login_url='login')
 def toggle_favorite(request, photo_id):
@@ -806,4 +774,86 @@ def admin_user_recipes(request, user_id):
         'total_favorites': total_favorites,
         'title': f'{user.username}\'s Recipes'
     }
-    return render(request, 'myapp/admin_user_recipes.html', context) 
+    return render(request, 'myapp/admin_user_recipes.html', context)
+
+@staff_member_required
+def manage_tags(request):
+    from .models import Tag
+    tags = Tag.objects.all()
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        if name:
+            tag, created = Tag.objects.get_or_create(name__iexact=name, defaults={'name': name})
+            if created:
+                messages.success(request, f'Tag "{name}" created successfully!')
+            else:
+                messages.warning(request, f'Tag "{name}" already exists!')
+        else:
+            messages.error(request, 'Tag name is required.')
+    return render(request, 'myapp/manage_tags.html', {'tags': tags})
+
+@staff_member_required
+def manage_ingredients(request):
+    from .models import Ingredient
+    ingredients = Ingredient.objects.all()
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        if name:
+            ingredient, created = Ingredient.objects.get_or_create(name__iexact=name, defaults={'name': name})
+            if created:
+                messages.success(request, f'Ingredient "{name}" created successfully!')
+            else:
+                messages.warning(request, f'Ingredient "{name}" already exists!')
+        else:
+            messages.error(request, 'Ingredient name is required.')
+    return render(request, 'myapp/manage_ingredients.html', {'ingredients': ingredients})
+
+@staff_member_required
+def update_tag(request, tag_id):
+    from .models import Tag
+    tag = get_object_or_404(Tag, id=tag_id)
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        if name:
+            tag.name = name
+            tag.save()
+            messages.success(request, 'Tag updated successfully!')
+            return redirect('manage_tags')
+        else:
+            messages.error(request, 'Tag name is required.')
+    return render(request, 'myapp/update_tag.html', {'tag': tag})
+
+@staff_member_required
+def delete_tag(request, tag_id):
+    from .models import Tag
+    tag = get_object_or_404(Tag, id=tag_id)
+    if request.method == 'POST':
+        tag.delete()
+        messages.success(request, 'Tag deleted successfully!')
+        return redirect('manage_tags')
+    return render(request, 'myapp/delete_tag.html', {'tag': tag})
+
+@staff_member_required
+def update_ingredient(request, ingredient_id):
+    from .models import Ingredient
+    ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        if name:
+            ingredient.name = name
+            ingredient.save()
+            messages.success(request, 'Ingredient updated successfully!')
+            return redirect('manage_ingredients')
+        else:
+            messages.error(request, 'Ingredient name is required.')
+    return render(request, 'myapp/update_ingredient.html', {'ingredient': ingredient})
+
+@staff_member_required
+def delete_ingredient(request, ingredient_id):
+    from .models import Ingredient
+    ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+    if request.method == 'POST':
+        ingredient.delete()
+        messages.success(request, 'Ingredient deleted successfully!')
+        return redirect('manage_ingredients')
+    return render(request, 'myapp/delete_ingredient.html', {'ingredient': ingredient}) 

@@ -1,0 +1,16 @@
+{% extends 'myapp/layout.html' %}
+{% block title %}Edit Ingredient{% endblock %}
+{% block main_content %}
+<div class="manage-ingredients-container">
+  <h2 class="mb-4"><i class="bi bi-basket-fill me-2" style="color: #f7b32b;"></i>Edit Ingredient</h2>
+  <form method="post" class="mb-4" style="max-width: 400px;">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="ingredientName" class="form-label">Ingredient Name</label>
+      <input type="text" id="ingredientName" name="name" class="form-control" value="{{ ingredient.name }}" required>
+    </div>
+    <button class="btn btn-primary" type="submit"><i class="bi bi-save"></i> Save Changes</button>
+    <a href="{% url 'manage_ingredients' %}" class="btn btn-secondary ms-2"><i class="bi bi-x-lg"></i> Cancel</a>
+  </form>
+</div>
+{% endblock %} 
