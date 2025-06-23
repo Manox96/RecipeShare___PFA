@@ -1,3 +1,8 @@
-Django>=5.0.0
-Pillow>=11.0.0
+Django==4.2.1
+Pillow==9.4.0
+Faker==18.4.0
+django-bootstrap5
+pycountry
+country_converter==1.1.1
 gunicorn>=21.2.0 
+requests 

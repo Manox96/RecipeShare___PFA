@@ -1,5 +1,5 @@
 from django import forms
-from .models import Photo, Recipe, RecipeIngredient, Step
+from .models import Photo, Recipe, RecipeIngredient, Step, Tag, Blog
 
 class PhotoUploadForm(forms.ModelForm):
     class Meta:
@@ -17,11 +17,17 @@ class PhotoUploadForm(forms.ModelForm):
 class RecipeForm(forms.ModelForm):
     # Add an ImageField for file uploads
     image = forms.ImageField(required=False, label='Recipe Image')
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label='Tags/Categories'
+    )
     
     class Meta:
         model = Recipe
         fields = ['title', 'description', 'difficulty', 'prep_time', 'cook_time', 
-                 'servings', 'cuisine', 'meal_type', 'image', 'is_public']
+                 'servings', 'cuisine', 'meal_type', 'image', 'is_public', 'tags']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control form-control-lg', 'required': True}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'required': True}),
@@ -100,4 +106,27 @@ StepFormSet = forms.inlineformset_factory(
     can_delete=True,
     min_num=1,
     validate_min=True
-) 
+)
+
+class BlogForm(forms.ModelForm):
+    tags = forms.CharField(
+        max_length=255, 
+        required=False,
+        help_text='Enter comma-separated tags.',
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = Blog
+        fields = ['title', 'content', 'image']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 10}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    subject = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5})) 

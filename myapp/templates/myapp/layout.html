@@ -4,7 +4,7 @@
 {% block content %}
 <style>
   body, .bg-auth {
-    background: #f6f7fa !important;
+    background: #f6f7fa !important;  
   }
   .main-container {
     min-height: 100vh;
@@ -407,6 +407,60 @@
   .btn-close:hover {
     opacity: 0.75;
   }
+  .main-footer {
+    background: #18181b;
+    color: #fff;
+    padding: 4rem 2rem 2rem;
+    margin-top: 4rem;
+    border-top-left-radius: 2rem;
+    border-top-right-radius: 2rem;
+  }
+  .footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  .footer-section h4 {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #f7b32b;
+  }
+  .footer-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  .footer-section ul li a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-weight: 500;
+    line-height: 2;
+  }
+  .footer-section ul li a:hover {
+    color: #fff;
+  }
+  .footer-socials {
+    display: flex;
+    gap: 1rem;
+  }
+  .footer-socials a {
+    color: #fff;
+    font-size: 1.4rem;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .footer-socials a:hover {
+    color: #f7b32b;
+    transform: translateY(-2px);
+  }
+  .footer-bottom {
+    text-align: center;
+    border-top: 1px solid #333;
+    padding-top: 2rem;
+    font-size: 0.95rem;
+    color: #aaa;
+  }
 </style>
 
 <nav class="main-navbar">
@@ -414,11 +468,14 @@
   <div class="navbar-links">
     <a href="/" class="navbar-link {% if request.resolver_match.url_name == 'main_page' %}active{% endif %}">Home</a>
     <a href="/recipes/" class="navbar-link {% if request.resolver_match.url_name == 'photo_list' %}active{% endif %}">Recipes</a>
-    <a href="#" class="navbar-link">Blog</a>
-    <a href="#" class="navbar-link">Contact</a>
+    <a href="{% url 'blog_list' %}" class="navbar-link {% if request.resolver_match.url_name == 'blog_list' %}active{% endif %}">
+      <i class="bi bi-journal-text"></i> Blog
+    </a>
+    <a href="{% url 'contact' %}" class="navbar-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+      <i class="bi bi-envelope"></i> Contact Us
+    </a>
   </div>
   <div class="navbar-actions">
-    <span class="navbar-search"><i class="bi bi-search"></i></span>
     {% if user.is_authenticated %}
       <div class="dropdown">
         <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" alt="avatar" class="avatar dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -437,7 +494,7 @@
 </nav>
 
 <div class="container-fluid main-container">
-  {% if request.user.is_authenticated and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' and not request.resolver_match.url_name|startswith:'admin_' and request.resolver_match.url_name != 'main_page' %}
+  {% if request.user.is_authenticated and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' and not request.resolver_match.url_name|startswith:'admin_' and request.resolver_match.url_name != 'main_page' and request.resolver_match.url_name != 'recipes_by_cuisine' and request.resolver_match.url_name != 'recipe_detail' %}
   <nav class="sidebar" style="position: static;">
     <div class="sidebar-sticky">
       <h4>Recipe Share</h4>
@@ -451,7 +508,7 @@
           <a class="nav-link {% if request.resolver_match.url_name == 'upload_photo' %}active{% endif %}" href="{% url 'upload_photo' %}">
             <i class="bi bi-cloud-upload me-2"></i> Upload Recipe
           </a>
-        </li>
+        </li> 
         <li class="nav-item mb-2">
           <a class="nav-link {% if request.resolver_match.url_name == 'favorite_photos' %}active{% endif %}" href="{% url 'favorite_photos' %}">
             <i class="bi bi-heart me-2"></i> Saved Recipes
@@ -459,17 +516,32 @@
           </a>
         </li>
       </ul>
-      {% comment %} <div class="stats-container">
-        <i class="bi bi-book"></i>
+      {% if user.is_staff %}
+      <nav class="nav flex-column mt-4">
+        <a class="nav-link {% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}" href="{% url 'manage_users' %}">
+          <i class="bi bi-people-fill"></i> Manage Users
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'blog_list' %}active{% endif %}" href="{% url 'blog_list' %}">
+          <i class="bi bi-journal-text"></i> Blog
+        </a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'create_blog' %}active{% endif %}" href="{% url 'create_blog' %}">
+          <i class="bi bi-plus-square"></i> Create Blog Post
+        </a>
+      </nav>
+      {% endif %}
+      {% comment %} {% if user.is_authenticated %}
+      <div class="stats-container">
+        <i class="bi bi-heart-fill"></i>
         <div class="stats-number">
           {% if photos %}{{ photos|length }}{% else %}0{% endif %}
         </div>
         <div class="stats-label">Total Recipes</div>
-      </div> {% endcomment %}
+      </div>
+      {% endif %} {% endcomment %}
     </div>
   </nav>
   {% endif %}
-  <main class="main-content {% if request.resolver_match.url_name == 'login' or request.resolver_match.url_name == 'register' or request.resolver_match.url_name|startswith:'admin_' or request.resolver_match.url_name == 'main_page' %}full-width{% endif %}">
+  <main class="main-content {% if request.resolver_match.url_name == 'login' or request.resolver_match.url_name == 'register' or request.resolver_match.url_name|startswith:'admin_' or request.resolver_match.url_name == 'main_page' or request.resolver_match.url_name == 'recipes_by_cuisine' or request.resolver_match.url_name == 'recipe_detail' %}full-width{% endif %}">
     {% if messages %}
     <div class="messages-container">
       {% for message in messages %}
@@ -485,4 +557,57 @@
     {% endblock %}
   </main>
 </div>
+
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>RecipeShare</h4>
+                <p style="color: #ccc; font-weight: 500;">Your daily source of culinary inspiration. Discover, cook, and share amazing recipes from around the world.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{% url 'main_page' %}">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="{% url 'blog_list' %}">Blog</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="footer-socials">
+                    <a href="#"><i class="bi bi-facebook"></i></a>
+                    <a href="#"><i class="bi bi-instagram"></i></a>
+                    <a href="#"><i class="bi bi-twitter"></i></a>
+                    <a href="#"><i class="bi bi-pinterest"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; {% now "Y" %} RecipeShare. All Rights Reserved.
+        </div>
+    </div>
+</footer>
+
+<script>
+  // Auto-hide alert messages after 5 seconds
+  document.addEventListener('DOMContentLoaded', (event) => {
+    const alertElements = document.querySelectorAll('.alert-dismissible');
+    alertElements.forEach((alert) => {
+      setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+      }, 2000); // 5 seconds
+    });
+  });
+</script>
+
 {% endblock %}

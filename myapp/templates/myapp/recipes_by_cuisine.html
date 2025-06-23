@@ -1,0 +1,206 @@
+{% extends 'myapp/layout.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block main_content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+<style>
+  body, .main-content {
+    background: #f8f6f2 !important;
+  }
+  .recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  .recipe-card {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 16px 0 rgba(60,60,120,0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, transform 0.2s;
+    border: none;
+  }
+  .recipe-card:hover {
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.13);
+    transform: translateY(-4px) scale(1.02);
+  }
+  .recipe-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #f8f6f2;
+  }
+  .recipe-content {
+    padding: 1.3rem 1.3rem 1rem 1.3rem;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .recipe-title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #18181b;
+    margin-bottom: 0.7rem;
+    min-height: 48px;
+  }
+  .recipe-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #888;
+    font-size: 0.98rem;
+    margin-bottom: 0.7rem;
+  }
+  .recipe-meta i {
+    color: #f7b32b;
+    margin-right: 0.2rem;
+  }
+  .see-recipe-btn {
+    background: #18181b;
+    color: #fff;
+    border: none;
+    border-radius: 1.2rem;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: auto;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .see-recipe-btn:hover {
+    background: #f7b32b;
+    color: #18181b;
+  }
+  .custom-pagination .page-link {
+    border-radius: 1rem !important;
+    margin: 0 0.2rem;
+    color: #18181b;
+    background: #f8f6f2;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(60,60,120,0.07);
+    transition: background 0.2s, color 0.2s;
+  }
+  .custom-pagination .page-link:hover {
+    background: #f7b32b;
+    color: #fff;
+  }
+  .custom-pagination .page-item.active .page-link {
+    background: #f7b32b;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 16px rgba(247,179,43,0.10);
+  }
+  .custom-pagination .page-item.disabled .page-link {
+    background: #eee;
+    color: #bbb;
+    border: none;
+  }
+  @media (max-width: 1200px) {
+    .recipes-grid {
+      gap: 1.2rem;
+    }
+    .recipe-title {
+      font-size: 1rem;
+    }
+  }
+  @media (max-width: 768px) {
+    .recipes-grid {
+      gap: 0.7rem;
+    }
+    .recipe-card {
+      font-size: 0.95rem;
+      padding: 0.7rem 0.5rem;
+    }
+    .recipe-title {
+      font-size: 0.95rem;
+    }
+  }
+</style>
+<div class="container py-5">
+  <h1 class="mb-4 text-center" style="font-weight: 800; color: #f7b32b;">
+    {% if cuisine.country_code %}
+      <span class="flag-icon flag-icon-{{ cuisine.country_code|lower }}"></span>
+    {% endif %}
+    {{ cuisine.name }} Recipes
+  </h1>
+  <p class="text-center mb-5" style="color: #555; font-size: 1.15rem;">Discover delicious recipes from the {{ cuisine.name }} cuisine.</p>
+  <div id="recipes-section" class="recipes-grid">
+    {% for recipe in recipes %}
+      <div class="recipe-card">
+        {% if recipe.image %}
+          <img src="{{ recipe.image.url }}" class="recipe-img" alt="{{ recipe.title }}">
+        {% else %}
+          <div class="recipe-img d-flex align-items-center justify-content-center" style="height:200px;">
+            <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
+          </div>
+        {% endif %}
+        <div class="recipe-content">
+          <div class="recipe-title">{{ recipe.title }}</div>
+          <div class="recipe-meta">
+            <span><i class="bi bi-eye"></i> {{ recipe.views|default:0 }}</span>
+            <span><i class="bi bi-clock"></i> {{ recipe.created_at|timesince }}</span>
+          </div>
+          <a href="{% url 'recipe_detail' recipe.id %}" class="see-recipe-btn">
+            See Complete Recipe <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="bi bi-emoji-smile text-muted" style="font-size: 3rem;"></i>
+          <p class="text-muted mt-3">No recipes found for this cuisine yet.</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination Controls -->
+  {% if recipes.has_other_pages %}
+    <nav aria-label="Recipe pagination" class="mt-4">
+      <ul class="pagination justify-content-center custom-pagination">
+        {% if recipes.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ recipes.previous_page_number }}#recipes-section" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">&laquo;</span>
+          </li>
+        {% endif %}
+
+        {% for num in recipes.paginator.page_range %}
+          {% if recipes.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}#recipes-section">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if recipes.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ recipes.next_page_number }}#recipes-section" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">&raquo;</span>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+{% endblock %} 

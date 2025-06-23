@@ -4,80 +4,279 @@
 
 {% block main_content %}
 <style>
-  .edit-user-card {
+  .edit-user-container {
     background: #fff;
     border-radius: 2rem;
     box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
     padding: 2.5rem;
-    margin: 2rem auto;
+    margin-bottom: 2rem;
     max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
   }
-  .edit-user-card h2 {
+  .edit-user-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f8f9fb;
+  }
+  .edit-user-header h2 {
     font-weight: 800;
     font-size: 1.8rem;
     color: #18181b;
-    margin-bottom: 2rem;
+    margin: 0;
+  }
+  .edit-user-header i {
+    color: #f7b32b;
+    font-size: 2rem;
+    background: rgba(247, 179, 43, 0.1);
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .form-group {
+    margin-bottom: 1.5rem;
   }
   .form-label {
-    font-weight: 500;
+    font-weight: 600;
     color: #444;
     margin-bottom: 0.5rem;
+    display: block;
+    font-size: 1rem;
   }
   .form-control {
-    border-radius: 0.9rem;
+    border-radius: 1rem;
     border: 1px solid #e5e7eb;
     background: #f8f9fb;
-    font-size: 1.08rem;
+    font-size: 1rem;
     padding: 0.85rem 1.1rem;
-    margin-bottom: 1.1rem;
-    transition: border 0.2s, box-shadow 0.2s;
+    width: 100%;
+    transition: all 0.2s ease;
+    font-weight: 500;
   }
   .form-control:focus {
-    border-color: #a5b4fc;
-    box-shadow: 0 0 0 2px #e0e7ff;
+    border-color: #f7b32b;
+    box-shadow: 0 0 0 3px rgba(247, 179, 43, 0.1);
     background: #fff;
+    outline: none;
+  }
+  .form-control::placeholder {
+    color: #9ca3af;
   }
   .form-check {
     margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .form-check-input {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 0.3rem;
+    border: 2px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .form-check-input:checked {
+    background: #f7b32b;
+    border-color: #f7b32b;
+  }
+  .form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(247, 179, 43, 0.1);
+  }
+  .form-check-label {
+    font-weight: 500;
+    color: #444;
+    cursor: pointer;
+    font-size: 1rem;
   }
   .btn-group {
     display: flex;
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #f8f9fb;
+  }
+  .btn {
+    padding: 0.85rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: #f7b32b;
+    color: #18181b;
+  }
+  .btn-primary:hover {
+    background: #e6a825;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(247, 179, 43, 0.3);
+  }
+  .btn-secondary {
+    background: #f3f4f6;
+    color: #444;
+  }
+  .btn-secondary:hover {
+    background: #e5e7eb;
+    color: #18181b;
+    transform: translateY(-1px);
+  }
+  .alert {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.5rem;
+  }
+  .alert-success {
+    background: #d4edda;
+    color: #155724;
+  }
+  .alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  .alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+  }
+  .alert-warning {
+    background: #fff3cd;
+    color: #856404;
+  }
+  .btn-close {
+    opacity: 0.5;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  .btn-close:hover {
+    opacity: 0.75;
+  }
+  .user-info-display {
+    background: #f8f9fb;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .user-info-display h5 {
+    color: #18181b;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .user-info-display h5 i {
+    color: #f7b32b;
+  }
+  .user-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .user-detail:last-child {
+    border-bottom: none;
+  }
+  .user-detail-label {
+    font-weight: 500;
+    color: #666;
+  }
+  .user-detail-value {
+    font-weight: 600;
+    color: #18181b;
+  }
+  @media (max-width: 768px) {
+    .edit-user-container {
+      margin: 1rem;
+      padding: 1.5rem;
+    }
+    .btn-group {
+      flex-direction: column;
+    }
+    .btn {
+      justify-content: center;
+    }
   }
 </style>
 
-<div class="edit-user-card">
-  <h2>
+<div class="edit-user-container">
+  <div class="edit-user-header">
     <i class="bi bi-person-gear"></i>
-    Edit User
-  </h2>
+    <h2>Edit User</h2>
+  </div>
 
   {% if messages %}
     {% for message in messages %}
       <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
         {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">&times;</button>
       </div>
     {% endfor %}
   {% endif %}
 
+  <div class="user-info-display">
+    <h5><i class="bi bi-info-circle"></i> Current User Information</h5>
+    <div class="user-detail">
+      <span class="user-detail-label">Username:</span>
+      <span class="user-detail-value">{{ user.username }}</span>
+    </div>
+    <div class="user-detail">
+      <span class="user-detail-label">Email:</span>
+      <span class="user-detail-value">{{ user.email }}</span>
+    </div>
+    <div class="user-detail">
+      <span class="user-detail-label">Status:</span>
+      <span class="user-detail-value">
+        {% if user.is_active %}
+          <span style="color: #10b981; font-weight: 600;">Active</span>
+        {% else %}
+          <span style="color: #ef4444; font-weight: 600;">Inactive</span>
+        {% endif %}
+      </span>
+    </div>
+    <div class="user-detail">
+      <span class="user-detail-label">Role:</span>
+      <span class="user-detail-value">
+        {% if user.is_staff %}
+          <span style="color: #f7b32b; font-weight: 600;">Admin</span>
+        {% else %}
+          <span style="color: #6b7280; font-weight: 600;">User</span>
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
   <form method="post">
     {% csrf_token %}
-    <div class="mb-3">
+    <div class="form-group">
       <label for="username" class="form-label">Username</label>
       <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
     </div>
-    <div class="mb-3">
+    <div class="form-group">
       <label for="email" class="form-label">Email</label>
       <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
     </div>
-    <div class="mb-3">
-      <label for="password" class="form-label">New Password (leave blank to keep current)</label>
-      <input type="password" class="form-control" id="password" name="password">
+    <div class="form-group">
+      <label for="password" class="form-label">New Password</label>
+      <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to keep current password">
     </div>
     <div class="form-check">
       <input type="checkbox" class="form-check-input" id="is_staff" name="is_staff" {% if user.is_staff %}checked{% endif %}>
@@ -91,7 +290,7 @@
       <button type="submit" class="btn btn-primary">
         <i class="bi bi-save"></i> Save Changes
       </button>
-      <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+      <a href="{% url 'manage_users' %}" class="btn btn-secondary">
         <i class="bi bi-x-lg"></i> Cancel
       </a>
     </div>

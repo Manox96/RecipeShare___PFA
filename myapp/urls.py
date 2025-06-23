@@ -11,10 +11,11 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     
     # Admin URLs - Changed from 'admin/' to 'dashboard/'
-    path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('dashboard/user/<int:user_id>/edit/', views.admin_edit_user, name='admin_edit_user'),
     path('dashboard/user/<int:user_id>/delete/', views.admin_delete_user, name='admin_delete_user'),
     path('dashboard/photo/<int:photo_id>/delete/', views.admin_delete_photo, name='admin_delete_photo'),
+    path('manage-users/', views.manage_users, name='manage_users'),
+    path('manage-users/user/<int:user_id>/recipes/', views.admin_user_recipes, name='admin_user_recipes'),
     
     # Recipe views
     path('recipes/', views.photo_list, name='photo_list'),
@@ -26,4 +27,12 @@ urlpatterns = [
     path('upload/', views.upload_photo, name='upload_photo'),
     path('favorites/', views.favorite_photos, name='favorite_photos'),
     path('ingredient/create/', views.create_ingredient, name='create_ingredient'),
+    path('tag/create/', views.create_tag, name='create_tag'),
+    path('cuisine/<int:cuisine_id>/', views.recipes_by_cuisine, name='recipes_by_cuisine'),
+    path('blogs/', views.blog_list, name='blog_list'),
+    path('blog/', views.blog_list, name='blog_list'),
+    path('blog/<int:blog_id>/', views.blog_detail, name='blog_detail'),
+    path('blog/create/', views.create_blog, name='create_blog'),
+    path('contact/', views.contact, name='contact'),
+    path('home/', views.home, name='home'),
 ] 

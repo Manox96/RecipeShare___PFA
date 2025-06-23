@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+import pycountry
+import country_converter as coco
 
 # Create your models here.
 class Photo(models.Model) :
@@ -23,6 +25,28 @@ class Difficulty(models.Model):
 
 class Cuisine(models.Model):
     name = models.CharField(max_length=50)
+    country_code = models.CharField(max_length=5, blank=True, null=True, help_text='ISO country code for flag display')
+
+    def save(self, *args, **kwargs):
+        if not self.country_code or self.country_code == 'not found':
+            # Handle special cases first
+            if self.name == 'American':
+                self.country_code = 'US'
+            elif self.name == 'Moroccan':
+                self.country_code = 'MA'
+            else:
+                try:
+                    # Use country_converter to find the ISO2 code
+                    self.country_code = coco.convert(names=self.name, to='ISO2')
+                except Exception:
+                    # If that fails, try with pycountry as a fallback
+                    try:
+                        country = pycountry.countries.get(name=self.name)
+                        if country:
+                            self.country_code = country.alpha_2
+                    except (AttributeError, KeyError):
+                        self.country_code = None  # Or a default value
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return self.name
@@ -71,6 +95,7 @@ class Recipe(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='recipes/', null=True, blank=True)
     is_public = models.BooleanField(default=True, help_text='If checked, this recipe will be visible on the main page')
+    tags = models.ManyToManyField('Tag', through='RecipeTag', blank=True)
     
     def __str__(self):
         return self.title
@@ -133,5 +158,17 @@ class Comment(models.Model):
             models.Index(fields=['recipe']),
             models.Index(fields=['created_at']),
         ]
+
+class Blog(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='blogs/', blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
     
     

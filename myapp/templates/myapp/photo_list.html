@@ -172,9 +172,9 @@
             </form>
             {% endif %}
             {% if request.user.is_authenticated %}
-            <a href="{% url 'toggle_favorite_recipe' recipe.id %}" class="btn btn-favorite {% if recipe in request.user.favorite_set.all %}active{% endif %}">
-              <i class="bi {% if recipe in request.user.favorite_set.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
-              {% if recipe in request.user.favorite_set.all %}Favorited{% else %}Favorite{% endif %}
+            <a href="{% url 'toggle_favorite_recipe' recipe.id %}" class="btn btn-favorite {% if recipe.id in all_user_favorite %}active{% endif %}">
+              <i class="bi {% if recipe.id in all_user_favorite %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+              {% if recipe.id in all_user_favorite %}Remove from Favorites{% else %}Add to Favorites{% endif %}
             </a>
             {% endif %}
           </div>

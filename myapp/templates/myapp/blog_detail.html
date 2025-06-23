@@ -1,0 +1,28 @@
+{% extends 'myapp/layout.html' %}
+
+{% block title %}{{ blog.title }}{% endblock %}
+
+{% block page_title %}{{ blog.title }}{% endblock %}
+
+{% block main_content %}
+<div class="container">
+    <div class="card">
+        {% if blog.image %}
+        <img src="{{ blog.image.url }}" class="card-img-top" alt="{{ blog.title }}" style="max-height: 300px; object-fit: cover;">
+        {% endif %}
+        <div class="card-body">
+            <p class="card-subtitle mb-2 text-muted">
+              By {{ blog.author.username }} on {{ blog.created_at|date:"F d, Y" }}
+            </p>
+            <div class="card-text">
+              {{ blog.content|linebreaks }}
+            </div>
+            <div class="mt-4">
+              {% for tag in blog.tags.all %}
+                <span class="badge bg-secondary">{{ tag.name }}</span>
+              {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

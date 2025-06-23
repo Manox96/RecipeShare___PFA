@@ -1,0 +1,250 @@
+{% extends 'myapp/layout.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block main_content %}
+<style>
+  body, .main-content {
+    background: #f8f6f2 !important;
+  }
+  
+  .blog-hero-section {
+    background: linear-gradient(135deg, #f7b32b 0%, #f04a4a 100%);
+    padding: 4rem 0;
+    text-align: center;
+    color: white;
+    margin-bottom: 3rem;
+    border-radius: 0 0 2rem 2rem;
+  }
+  
+  .blog-hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .blog-hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .blog-card {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 16px 0 rgba(60,60,120,0.08);
+    overflow: hidden;
+    text-align: left;
+    transition: box-shadow 0.2s, transform 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  
+  .blog-card:hover {
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.13);
+    transform: translateY(-4px);
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .blog-img-container {
+    position: relative;
+    height: 220px;
+  }
+  
+  .blog-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .blog-tag {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background-color: #f04a4a;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  
+  .blog-content {
+    padding: 1.5rem;
+  }
+  
+  .blog-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #18181b;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+  
+  .blog-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 1rem;
+  }
+  
+  .blog-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  
+  .blog-meta i {
+    color: #f7b32b;
+  }
+  
+  .blog-excerpt {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+  
+  .read-more-btn {
+    background: #18181b;
+    color: #fff;
+    border: none;
+    border-radius: 1.2rem;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+  
+  .read-more-btn:hover {
+    background: #f7b32b;
+    color: #18181b;
+    text-decoration: none;
+  }
+  
+  .blog-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .blog-tag-item {
+    background: #f8f6f2;
+    color: #666;
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+  }
+  
+  .empty-state i {
+    font-size: 4rem;
+    color: #ddd;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-state h3 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    .blog-hero-title {
+      font-size: 2rem;
+    }
+    
+    .blog-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .blog-hero-section {
+      padding: 2rem 1rem;
+      margin-bottom: 2rem;
+    }
+  }
+</style>
+
+<!-- Blog Hero Section -->
+<div class="blog-hero-section">
+  <div class="container">
+    <h1 class="blog-hero-title">Our Journal</h1>
+    <p class="blog-hero-subtitle">Discover stories, tips, and trends to inspire your culinary journey and creativity!</p>
+  </div>
+</div>
+
+<!-- Blog Grid -->
+<div class="container">
+  <div class="blog-grid">
+    {% for blog in blogs %}
+    <a href="{% url 'blog_detail' blog.id %}" class="blog-card">
+      <div class="blog-img-container">
+        {% if blog.image %}
+          <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="blog-img">
+        {% else %}
+          <div class="blog-img d-flex align-items-center justify-content-center" style="background: #f8f6f2;">
+            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+          </div>
+        {% endif %}
+        {% with blog.tags.all|first as first_tag %}
+          {% if first_tag %}
+            <span class="blog-tag">{{ first_tag.name }}</span>
+          {% endif %}
+        {% endwith %}
+      </div>
+      <div class="blog-content">
+        <h3 class="blog-title">{{ blog.title }}</h3>
+        <div class="blog-meta">
+          <span><i class="bi bi-person"></i> {{ blog.author.get_full_name|default:blog.author.username }}</span>
+          <span><i class="bi bi-clock"></i> {{ blog.created_at|timesince }} ago</span>
+          <span><i class="bi bi-calendar3"></i> {{ blog.created_at|date:"M d, Y" }}</span>
+        </div>
+        <div class="blog-excerpt">
+          {{ blog.content|truncatewords:30|striptags }}
+        </div>
+        <div class="blog-tags">
+          {% for tag in blog.tags.all %}
+            <span class="blog-tag-item">{{ tag.name }}</span>
+          {% endfor %}
+        </div>
+        <div class="read-more-btn">
+          Read More <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty-state">
+      <i class="bi bi-journal-text"></i>
+      <h3>No blog posts yet</h3>
+      <p>Check back soon for inspiring culinary stories and tips!</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %} 

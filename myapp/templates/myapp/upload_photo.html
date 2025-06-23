@@ -8,7 +8,6 @@
                 <div class="card-body p-4">
                     <h2 class="card-title mb-4 text-center">Upload New Recipe</h2>
                     
-                    {% if messages %}
                     <div class="messages mb-4">
                         {% for message in messages %}
                         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -17,7 +16,6 @@
                         </div>
                         {% endfor %}
                     </div>
-                    {% endif %}
                     
                     <form method="post" enctype="multipart/form-data" class="needs-validation" id="recipeForm">
                         {% csrf_token %}
@@ -40,6 +38,21 @@
                             <label for="id_description" class="form-label">Description</label>
                             <textarea class="form-control" id="id_description" name="description" rows="3" required></textarea>
                             <div class="invalid-feedback">Please provide a description.</div>
+                        </div>
+                        <!-- Tags/Categories Section -->
+                        <div class="mb-4">
+                            <label class="form-label">Tags</label>
+                            <div class="d-flex flex-wrap gap-2" id="tags-checkboxes">
+                                {% for tag in form.tags.field.queryset %}
+                                    <input type="checkbox" name="tags" value="{{ tag.id }}" id="tag_{{ tag.id }}" class="tag-checkbox" {% if tag in form.initial.tags or tag in form.cleaned_data.tags %}checked{% endif %}>
+                                    <label for="tag_{{ tag.id }}" class="tag-label">{{ tag.name }}</label>
+                                {% endfor %}
+                            </div>
+                            <div class="input-group mt-2" style="max-width: 400px;">
+                                <input type="text" class="form-control" id="newTagName" placeholder="Add new tag...">
+                                <button type="button" class="btn btn-primary" id="addNewTagBtn">Add Tag</button>
+                            </div>
+                            <div id="newTagFeedback" class="form-text text-danger"></div>
                         </div>
 
                         <!-- Recipe Details -->
@@ -73,11 +86,7 @@
                                 </select>
                                 <div class="invalid-feedback">Please select a meal type.</div>
                             </div>
-                            <div class="col-md-3">
-                                <label for="id_servings" class="form-label">Servings</label>
-                                <input type="number" class="form-control" id="id_servings" name="servings" min="1" required>
-                                <div class="invalid-feedback">Please enter the number of servings.</div>
-                            </div>
+                           
                         </div>
 
                         <div class="row mb-4">
@@ -134,6 +143,36 @@
                                     </div>
                                 {% endfor %}
                             </div>
+                            <!-- Hidden template for a blank ingredient form -->
+                            <div id="empty-ingredient-template" style="display:none;">
+                                <div class="row mb-2 ingredient-form">
+                                    <div class="col-md-4">
+                                        <select class="form-select" required>
+                                            <option value="">Select ingredient...</option>
+                                            {% for ingredient in ingredients %}
+                                                <option value="{{ ingredient.id }}">{{ ingredient.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">Please select an ingredient.</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" placeholder="Quantity" required>
+                                        <div class="invalid-feedback">Please enter quantity.</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-select" required>
+                                            <option value="">Select unit...</option>
+                                            {% for unit in units %}
+                                                <option value="{{ unit.id }}">{{ unit.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">Please select a unit.</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger remove-ingredient">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Steps Section -->
@@ -143,11 +182,11 @@
                             <div id="steps-container">
                                 {% for form in step_formset %}
                                     <div class="row mb-2 step-form">
-                                        <div class="col-md-1">
-                                            <input type="number" class="form-control" name="{{ form.step_number.html_name }}" value="{{ forloop.counter }}" readonly>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <div class="step-number" style="display: flex; align-items: center; justify-content: center; height: 100%;">{{ forloop.counter }}</div>
                                         </div>
                                         <div class="col-md-9">
-                                            <textarea class="form-control" name="{{ form.instruction.html_name }}" rows="2" required></textarea>
+                                            <textarea class="form-control" name="{{ form.instruction.html_name }}" rows="2" required>{{ form.instruction.value|default_if_none:"" }}</textarea>
                                             <div class="invalid-feedback">Please enter step instructions.</div>
                                         </div>
                                         <div class="col-md-2">
@@ -157,6 +196,22 @@
                                 {% endfor %}
                             </div>
                             <button type="button" class="btn btn-secondary mt-2" id="add-step">Add Step</button>
+                        </div>
+
+                        <!-- Hidden template for a blank step form -->
+                        <div id="empty-form-template" style="display:none;">
+                            <div class="row mb-2 step-form">
+                                <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                    <div class="step-number" style="display: flex; align-items: center; justify-content: center; height: 100%;"></div>
+                                </div>
+                                <div class="col-md-9">
+                                    <textarea class="form-control" rows="2" required></textarea>
+                                    <div class="invalid-feedback">Please enter step instructions.</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-danger remove-step">Remove</button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2">
@@ -209,6 +264,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const newIngredientModal = new bootstrap.Modal(document.getElementById('newIngredientModal'));
     const newIngredientForm = document.getElementById('newIngredientForm');
     const saveNewIngredientBtn = document.getElementById('saveNewIngredient');
+    const addNewTagBtn = document.getElementById('addNewTagBtn');
+    const newTagNameInput = document.getElementById('newTagName');
+    const newTagFeedback = document.getElementById('newTagFeedback');
+    const tagsDiv = document.getElementById('tags-checkboxes');
 
     // Function to create new ingredient
     async function createNewIngredient(name) {
@@ -231,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const option = new Option(data.ingredient.name, data.ingredient.id);
                     select.add(option);
                 });
-                
                 // Show success message
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-success alert-dismissible fade show';
@@ -239,21 +297,42 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${data.message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 `;
-                document.querySelector('.messages').appendChild(alertDiv);
-                
+                const messagesDiv = document.querySelector('.messages');
+                messagesDiv.prepend(alertDiv);
+                alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    alertDiv.addEventListener('transitionend', () => alertDiv.remove());
+                }, 30000); // 30 seconds
                 // Close the modal and reset the form
                 newIngredientModal.hide();
                 newIngredientForm.reset();
-                
                 // Select the new ingredient in the last ingredient form
                 const lastIngredientForm = document.querySelector('.ingredient-form:last-child');
                 if (lastIngredientForm) {
                     const select = lastIngredientForm.querySelector('select[name*="ingredient"]');
                     select.value = data.ingredient.id;
                 }
-            } else {
-                throw new Error(data.message);
+                return; // Success, so exit
             }
+            // If not success, show as info if already exists, else as error
+            const alertDiv = document.createElement('div');
+            let alertType = data.message.includes('already exists') ? 'alert-info' : 'alert-danger';
+            alertDiv.className = `alert ${alertType} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${data.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            const messagesDiv = document.querySelector('.messages');
+            messagesDiv.prepend(alertDiv);
+            alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+                alertDiv.addEventListener('transitionend', () => alertDiv.remove());
+            }, 10000); // 30 seconds
+            // Close the modal and reset the form on error as well
+            newIngredientModal.hide();
+            newIngredientForm.reset();
         } catch (error) {
             // Show error message
             const alertDiv = document.createElement('div');
@@ -262,7 +341,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${error.message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             `;
-            document.querySelector('.messages').appendChild(alertDiv);
+            const messagesDiv = document.querySelector('.messages');
+            messagesDiv.prepend(alertDiv);
+            alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+                alertDiv.addEventListener('transitionend', () => alertDiv.remove());
+            }, 30000); // 30 seconds
+            // Close the modal and reset the form on error as well
+            newIngredientModal.hide();
+            newIngredientForm.reset();
         }
     }
 
@@ -283,34 +371,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to add new ingredient
     function addIngredient() {
         const ingredientForms = document.querySelectorAll('.ingredient-form');
-        const formNum = ingredientForms.length;
-        const newIngredient = ingredientForms[0].cloneNode(true);
-        
-        // Clear the values
-        const selects = newIngredient.querySelectorAll('select');
-        const inputs = newIngredient.querySelectorAll('input');
-        
-        selects.forEach(select => {
-            select.value = '';
-            select.classList.remove('is-invalid');
-        });
-        
-        inputs.forEach(input => {
-            input.value = '';
-            input.classList.remove('is-invalid');
-        });
-        
-        // Update the form index
-        const regex = new RegExp(`(${formNum - 1})`, 'g');
-        newIngredient.innerHTML = newIngredient.innerHTML.replace(regex, formNum);
-        
+        let newIngredient;
+        if (ingredientForms.length > 0) {
+            newIngredient = ingredientForms[0].cloneNode(true);
+            // Clear the values
+            const selects = newIngredient.querySelectorAll('select');
+            const inputs = newIngredient.querySelectorAll('input');
+            selects.forEach(select => {
+                select.value = '';
+                select.classList.remove('is-invalid');
+            });
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('is-invalid');
+            });
+        } else {
+            // Use the hidden template if no forms exist
+            const template = document.getElementById('empty-ingredient-template').innerHTML;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = template;
+            newIngredient = tempDiv.firstElementChild;
+        }
         // Add remove button functionality
         const removeBtn = newIngredient.querySelector('.remove-ingredient');
         removeBtn.addEventListener('click', function() {
             newIngredient.remove();
             updateTotalIngredientForms();
         });
-        
         ingredientsContainer.appendChild(newIngredient);
         updateTotalIngredientForms();
     }
@@ -333,63 +420,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Function to add new step
-    function addStep() {
-        const stepForms = document.querySelectorAll('.step-form');
-        const formNum = stepForms.length;
-        const newStep = stepForms[0].cloneNode(true);
-        
-        // Update the step number
-        const stepNumberInput = newStep.querySelector('input[type="number"]');
-        stepNumberInput.value = formNum + 1;
-        
-        // Clear the instruction textarea
-        const instructionTextarea = newStep.querySelector('textarea');
-        instructionTextarea.value = '';
-        
-        // Update the form index
-        const regex = new RegExp(`(${formNum - 1})`, 'g');
-        newStep.innerHTML = newStep.innerHTML.replace(regex, formNum);
-        
-        // Add remove button functionality
-        const removeBtn = newStep.querySelector('.remove-step');
-        removeBtn.addEventListener('click', function() {
-            newStep.remove();
-            updateStepNumbers();
-            updateTotalForms();
-        });
-        
-        stepsContainer.appendChild(newStep);
-        updateTotalForms();
-    }
-
-    // Function to update step numbers
     function updateStepNumbers() {
-        const stepForms = document.querySelectorAll('.step-form');
-        stepForms.forEach((form, index) => {
-            const stepNumberInput = form.querySelector('input[type="number"]');
-            stepNumberInput.value = index + 1;
+        document.querySelectorAll('#steps-container .step-form').forEach(function(form, idx) {
+            form.querySelector('.step-number').textContent = idx + 1;
         });
     }
 
-    // Function to update total forms count
-    function updateTotalForms() {
-        const stepForms = document.querySelectorAll('.step-form');
-        totalForms.value = stepForms.length;
-    }
-
-    // Add click event listener to add step button
-    addStepBtn.addEventListener('click', addStep);
-
-    // Add remove functionality to existing step forms
-    document.querySelectorAll('.remove-step').forEach(button => {
-        button.addEventListener('click', function() {
-            const stepForm = this.closest('.step-form');
-            stepForm.remove();
-            updateStepNumbers();
-            updateTotalForms();
-        });
+    document.getElementById('add-step').addEventListener('click', function() {
+        var template = document.getElementById('empty-form-template').innerHTML;
+        var tempDiv = document.createElement('div');
+        tempDiv.innerHTML = template;
+        var newStep = tempDiv.firstElementChild;
+        document.getElementById('steps-container').appendChild(newStep);
+        updateStepNumbers();
     });
+
+    document.getElementById('steps-container').addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('remove-step')) {
+            // Debug log to confirm event handler is triggered
+            console.log('Remove button clicked');
+            var stepForm = e.target.closest('.step-form');
+            if (stepForm) {
+                stepForm.remove();
+                updateStepNumbers();
+            }
+        }
+    });
+
+    // Initial numbering on page load
+    updateStepNumbers();
 
     form.addEventListener('submit', function(event) {
         event.preventDefault();
@@ -470,6 +529,52 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...';
         form.submit();
     });
+
+    addNewTagBtn.addEventListener('click', async function() {
+        const tagName = newTagNameInput.value.trim();
+        if (!tagName) {
+            newTagFeedback.textContent = 'Please enter a tag name.';
+            return;
+        }
+        newTagFeedback.textContent = '';
+        addNewTagBtn.disabled = true;
+        try {
+            const response = await fetch('/tag/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: `name=${encodeURIComponent(tagName)}`
+            });
+            const data = await response.json();
+            if (data.success) {
+                // Add the new tag styled like the pill tags
+                const newId = `tag_${data.tag.id}`;
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'tag-checkbox';
+                checkbox.name = 'tags';
+                checkbox.value = data.tag.id;
+                checkbox.id = newId;
+                checkbox.checked = true;
+                const label = document.createElement('label');
+                label.className = 'tag-label';
+                label.setAttribute('for', newId);
+                label.textContent = data.tag.name;
+                tagsDiv.appendChild(checkbox);
+                tagsDiv.appendChild(label);
+                newTagNameInput.value = '';
+                newTagFeedback.textContent = '';
+            } else {
+                newTagFeedback.textContent = data.message;
+            }
+        } catch (error) {
+            newTagFeedback.textContent = 'Error creating tag.';
+        } finally {
+            addNewTagBtn.disabled = false;
+        }
+    });
 });
 </script>
 
@@ -540,6 +645,35 @@ document.addEventListener('DOMContentLoaded', function() {
     .alert-danger {
         background: #f8d7da;
         color: #721c24;
+    }
+
+    .tag-checkbox {
+        display: none;
+    }
+    .tag-label {
+        display: inline-block;
+        padding: 0.5rem 1.2rem;
+        border-radius: 2rem;
+        background: #f8f6f2;
+        color: #18181b;
+        border: 1.5px solid #f7b32b;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        margin-right: 0.5rem;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, border 0.2s;
+        box-shadow: 0 2px 8px rgba(60,60,120,0.07);
+    }
+    .tag-checkbox:checked + .tag-label {
+        background: #f7b32b;
+        color: #fff;
+        border-color: #f7b32b;
+        box-shadow: 0 4px 16px rgba(247,179,43,0.10);
+    }
+    .tag-label:hover {
+        background: #ffe6a1;
+        color: #18181b;
+        border-color: #f7b32b;
     }
 </style>
 {% endblock %} 
