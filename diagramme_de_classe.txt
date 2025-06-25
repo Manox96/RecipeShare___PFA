@@ -1,0 +1,460 @@
+DIAGRAMME DE CLASSE - RECIPE SHARE
+==================================
+
+📋 CLASSES PRINCIPALES
+======================
+
+🔹 User (Django Built-in)
+------------------------
++ username: String
++ email: String
++ first_name: String
++ last_name: String
++ password: String
++ is_active: Boolean
++ is_staff: Boolean
++ date_joined: DateTime
++ last_login: DateTime
++ __str__(): String
+
+🔹 Profile
+----------
++ user: OneToOneField(User)
++ avatar: ImageField
++ __str__(): String
+
+🔹 Photo
+--------
++ user: ForeignKey(User)
++ Nom: String(200)
++ Descreption: Text
++ upload_date: DateTime
++ image: ImageField
++ favorites: ManyToManyField(User)
++ __str__(): String
+
+🔹 Difficulty
+-------------
++ name: String(50)
++ __str__(): String
+
+🔹 Cuisine
+----------
++ name: String(50)
++ country_code: String(5)
++ save(): void
++ __str__(): String
+
+🔹 MealType
+-----------
++ name: String(50)
++ __str__(): String
+
+🔹 Ingredient
+-------------
++ name: String(100)
++ __str__(): String
+
+🔹 Unit
+-------
++ name: String(50)
++ __str__(): String
+
+🔹 Tag
+------
++ name: String(50)
++ __str__(): String
+
+🔹 Recipe
+---------
++ title: String(200)
++ description: Text
++ difficulty: ForeignKey(Difficulty)
++ cuisine: ForeignKey(Cuisine)
++ meal_type: ForeignKey(MealType)
++ prep_time: Integer
++ cook_time: Integer
++ servings: Integer
++ user: ForeignKey(User)
++ created_at: DateTime
++ updated_at: DateTime
++ image: ImageField
++ is_public: Boolean
++ tags: ManyToManyField(Tag)
++ __str__(): String
+
+🔹 RecipeIngredient
+-------------------
++ recipe: ForeignKey(Recipe)
++ ingredient: ForeignKey(Ingredient)
++ quantity: Decimal(10,2)
++ unit: ForeignKey(Unit)
++ __str__(): String
+
+🔹 Step
+-------
++ recipe: ForeignKey(Recipe)
++ step_number: Integer
++ instruction: Text
++ __str__(): String
+
+🔹 RecipeTag
+------------
++ recipe: ForeignKey(Recipe)
++ tag: ForeignKey(Tag)
+
+🔹 Favorite
+-----------
++ user: ForeignKey(User)
++ recipe: ForeignKey(Recipe)
++ created_at: DateTime
+
+🔹 Comment
+----------
++ user: ForeignKey(User)
++ recipe: ForeignKey(Recipe)
++ comment: Text
++ created_at: DateTime
+
+🔹 Blog
+-------
++ title: String(200)
++ content: Text
++ author: ForeignKey(User)
++ image: ImageField
++ tags: ManyToManyField(Tag)
++ created_at: DateTime
++ updated_at: DateTime
++ __str__(): String
+
+🔹 BlogComment
+--------------
++ user: ForeignKey(User)
++ blog: ForeignKey(Blog)
++ comment: Text
++ created_at: DateTime
++ __str__(): String
+
+🔗 RELATIONS
+============
+
+HERITAGE:
+---------
+Profile → User (OneToOne)
+RecipeIngredient → Recipe (ManyToOne)
+Step → Recipe (ManyToOne)
+RecipeTag → Recipe (ManyToOne)
+RecipeTag → Tag (ManyToOne)
+Favorite → User (ManyToOne)
+Favorite → Recipe (ManyToOne)
+Comment → User (ManyToOne)
+Comment → Recipe (ManyToOne)
+Blog → User (ManyToOne)
+BlogComment → User (ManyToOne)
+BlogComment → Blog (ManyToOne)
+Recipe → Difficulty (ManyToOne)
+Recipe → Cuisine (ManyToOne)
+Recipe → MealType (ManyToOne)
+Photo → User (ManyToOne)
+
+ASSOCIATIONS:
+-------------
+User ↔ Photo (OneToMany)
+User ↔ Recipe (OneToMany)
+User ↔ Blog (OneToMany)
+User ↔ Favorite (OneToMany)
+User ↔ Comment (OneToMany)
+User ↔ BlogComment (OneToMany)
+User ↔ Profile (OneToOne)
+Recipe ↔ RecipeIngredient (OneToMany)
+Recipe ↔ Step (OneToMany)
+Recipe ↔ Comment (OneToMany)
+Recipe ↔ Favorite (OneToMany)
+Blog ↔ BlogComment (OneToMany)
+Recipe ↔ Tag (ManyToMany via RecipeTag)
+Blog ↔ Tag (ManyToMany)
+Photo ↔ User (ManyToMany via favorites)
+
+📊 CARDINALITÉS
+===============
+
+1..1 (OneToOne):
+- User ↔ Profile
+- Recipe ↔ Difficulty
+- Recipe ↔ MealType
+- RecipeIngredient ↔ Ingredient
+- RecipeIngredient ↔ Unit
+- Step ↔ Recipe
+- RecipeTag ↔ Recipe
+- RecipeTag ↔ Tag
+- Favorite ↔ User
+- Favorite ↔ Recipe
+- Comment ↔ User
+- Comment ↔ Recipe
+- BlogComment ↔ User
+- BlogComment ↔ Blog
+
+1..* (OneToMany):
+- User → Photo
+- User → Recipe
+- User → Blog
+- User → Favorite
+- User → Comment
+- User → BlogComment
+- Recipe → RecipeIngredient
+- Recipe → Step
+- Recipe → Comment
+- Recipe → Favorite
+- Blog → BlogComment
+- Difficulty → Recipe
+- Cuisine → Recipe
+- MealType → Recipe
+- Ingredient → RecipeIngredient
+- Unit → RecipeIngredient
+
+*..* (ManyToMany):
+- User ↔ Photo (via favorites)
+- Recipe ↔ Tag (via RecipeTag)
+- Blog ↔ Tag
+
+🎨 VISUAL DIAGRAM STRUCTURE
+===========================
+
+PACKAGES (Groupes logiques):
+1. "Authentification & Profil"
+   - User
+   - Profile
+
+2. "Gestion des Recettes"
+   - Recipe
+   - RecipeIngredient
+   - Step
+   - Difficulty
+   - Cuisine
+   - MealType
+   - Ingredient
+   - Unit
+
+3. "Système de Tags"
+   - Tag
+   - RecipeTag
+
+4. "Fonctionnalités Sociales"
+   - Favorite
+   - Comment
+
+5. "Système de Blog"
+   - Blog
+   - BlogComment
+
+6. "Gestion des Médias"
+   - Photo
+
+🔧 PLANTUML TEMPLATE
+===================
+
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam packageStyle rectangle
+
+package "Authentification & Profil" {
+  class User {
+    + username: String
+    + email: String
+    + first_name: String
+    + last_name: String
+    + password: String
+    + is_active: Boolean
+    + is_staff: Boolean
+    + date_joined: DateTime
+    + last_login: DateTime
+    + __str__(): String
+  }
+  
+  class Profile {
+    + user: OneToOneField(User)
+    + avatar: ImageField
+    + __str__(): String
+  }
+}
+
+package "Gestion des Recettes" {
+  class Recipe {
+    + title: String(200)
+    + description: Text
+    + difficulty: ForeignKey(Difficulty)
+    + cuisine: ForeignKey(Cuisine)
+    + meal_type: ForeignKey(MealType)
+    + prep_time: Integer
+    + cook_time: Integer
+    + servings: Integer
+    + user: ForeignKey(User)
+    + created_at: DateTime
+    + updated_at: DateTime
+    + image: ImageField
+    + is_public: Boolean
+    + tags: ManyToManyField(Tag)
+    + __str__(): String
+  }
+  
+  class RecipeIngredient {
+    + recipe: ForeignKey(Recipe)
+    + ingredient: ForeignKey(Ingredient)
+    + quantity: Decimal(10,2)
+    + unit: ForeignKey(Unit)
+    + __str__(): String
+  }
+  
+  class Step {
+    + recipe: ForeignKey(Recipe)
+    + step_number: Integer
+    + instruction: Text
+    + __str__(): String
+  }
+  
+  class Difficulty {
+    + name: String(50)
+    + __str__(): String
+  }
+  
+  class Cuisine {
+    + name: String(50)
+    + country_code: String(5)
+    + save(): void
+    + __str__(): String
+  }
+  
+  class MealType {
+    + name: String(50)
+    + __str__(): String
+  }
+  
+  class Ingredient {
+    + name: String(100)
+    + __str__(): String
+  }
+  
+  class Unit {
+    + name: String(50)
+    + __str__(): String
+  }
+}
+
+package "Système de Tags" {
+  class Tag {
+    + name: String(50)
+    + __str__(): String
+  }
+  
+  class RecipeTag {
+    + recipe: ForeignKey(Recipe)
+    + tag: ForeignKey(Tag)
+  }
+}
+
+package "Fonctionnalités Sociales" {
+  class Favorite {
+    + user: ForeignKey(User)
+    + recipe: ForeignKey(Recipe)
+    + created_at: DateTime
+  }
+  
+  class Comment {
+    + user: ForeignKey(User)
+    + recipe: ForeignKey(Recipe)
+    + comment: Text
+    + created_at: DateTime
+  }
+}
+
+package "Système de Blog" {
+  class Blog {
+    + title: String(200)
+    + content: Text
+    + author: ForeignKey(User)
+    + image: ImageField
+    + tags: ManyToManyField(Tag)
+    + created_at: DateTime
+    + updated_at: DateTime
+    + __str__(): String
+  }
+  
+  class BlogComment {
+    + user: ForeignKey(User)
+    + blog: ForeignKey(Blog)
+    + comment: Text
+    + created_at: DateTime
+    + __str__(): String
+  }
+}
+
+package "Gestion des Médias" {
+  class Photo {
+    + user: ForeignKey(User)
+    + Nom: String(200)
+    + Descreption: Text
+    + upload_date: DateTime
+    + image: ImageField
+    + favorites: ManyToManyField(User)
+    + __str__(): String
+  }
+}
+
+' Relations
+User ||--|| Profile
+User ||--o{ Recipe
+User ||--o{ Blog
+User ||--o{ Favorite
+User ||--o{ Comment
+User ||--o{ BlogComment
+User ||--o{ Photo
+Recipe ||--o{ RecipeIngredient
+Recipe ||--o{ Step
+Recipe ||--o{ Comment
+Recipe ||--o{ Favorite
+Blog ||--o{ BlogComment
+Recipe }o--|| Difficulty
+Recipe }o--|| Cuisine
+Recipe }o--|| MealType
+RecipeIngredient }o--|| Ingredient
+RecipeIngredient }o--|| Unit
+RecipeTag }o--|| Recipe
+RecipeTag }o--|| Tag
+Blog }o--|| User
+Blog }o--o{ Tag
+Photo }o--o{ User
+
+@enduml
+
+💡 QUICK DIAGRAM CREATION STEPS
+===============================
+
+1. COPY the PlantUML template above
+2. PASTE into https://www.plantuml.com/plantuml/uml/
+3. CUSTOMIZE by adding/removing classes
+4. DOWNLOAD as PNG/SVG/PDF
+5. IMPORT into Lucidchart/Draw.io if needed
+
+🚀 READY TO USE!
+===============
+
+This class diagram shows the complete data model of your Recipe Share application with all relationships, attributes, and methods clearly defined! 
+
+TITRE: Inscription d'un nouvel utilisateur
+ACTEURS: Utilisateur Invité, Système, Base de Données
+
+SÉQUENCE:
+1. Utilisateur Invité → Page d'inscription
+2. Utilisateur Invité → Saisit nom d'utilisateur, email, mot de passe
+3. Utilisateur Invité → Clic sur "S'inscrire"
+4. Page d'inscription → Validation des données
+5. Page d'inscription → Vérification unicité username/email
+6. Page d'inscription → Base de Données (créer utilisateur)
+7. Base de Données → Confirmation création
+8. Page d'inscription → Création profil automatique
+9. Page d'inscription → Connexion automatique
+10. Page d'inscription → Redirection vers page principale
+11. Système → Affichage message de succès
