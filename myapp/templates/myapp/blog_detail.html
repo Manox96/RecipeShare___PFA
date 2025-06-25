@@ -2,27 +2,314 @@
 
 {% block title %}{{ blog.title }}{% endblock %}
 
-{% block page_title %}{{ blog.title }}{% endblock %}
-
 {% block main_content %}
-<div class="container">
-    <div class="card">
-        {% if blog.image %}
-        <img src="{{ blog.image.url }}" class="card-img-top" alt="{{ blog.title }}" style="max-height: 300px; object-fit: cover;">
-        {% endif %}
-        <div class="card-body">
-            <p class="card-subtitle mb-2 text-muted">
-              By {{ blog.author.username }} on {{ blog.created_at|date:"F d, Y" }}
-            </p>
-            <div class="card-text">
-              {{ blog.content|linebreaks }}
-            </div>
-            <div class="mt-4">
-              {% for tag in blog.tags.all %}
-                <span class="badge bg-secondary">{{ tag.name }}</span>
-              {% endfor %}
-            </div>
-        </div>
+<style>
+  .blog-detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  
+  .blog-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .blog-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #18181b;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  
+  .blog-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+  
+  .blog-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  
+  .blog-meta i {
+    color: #f7b32b;
+  }
+  
+  .blog-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  
+  .blog-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+    margin-bottom: 3rem;
+  }
+  
+  .blog-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .blog-tag {
+    background: #f7b32b;
+    color: #18181b;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  
+  .comments-section {
+    border-top: 2px solid #f0f0f0;
+    padding-top: 2rem;
+  }
+  
+  .comments-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #18181b;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .comment-form {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .comment-form h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #18181b;
+  }
+  
+  .comment-form .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  
+  .comment-form .form-control:focus {
+    border-color: #f7b32b;
+    box-shadow: 0 0 0 0.2rem rgba(247, 179, 43, 0.25);
+  }
+  
+  .btn-comment {
+    background: #f7b32b;
+    color: #18181b;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  
+  .btn-comment:hover {
+    background: #e6a825;
+    transform: translateY(-1px);
+  }
+  
+  .comments-list {
+    margin-top: 2rem;
+  }
+  
+  .comment-item {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s;
+  }
+  
+  .comment-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .comment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  
+  .comment-author {
+    font-weight: 600;
+    color: #18181b;
+    font-size: 1rem;
+  }
+  
+  .comment-date {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .comment-text {
+    color: #333;
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+  
+  .no-comments {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    background: #f8f9fa;
+    border-radius: 1rem;
+  }
+  
+  .no-comments i {
+    font-size: 3rem;
+    color: #ddd;
+    margin-bottom: 1rem;
+  }
+  
+  .login-prompt {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .login-prompt a {
+    color: #f7b32b;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  
+  .login-prompt a:hover {
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .blog-title {
+      font-size: 2rem;
+    }
+    
+    .blog-meta {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .blog-detail-container {
+      padding: 1rem;
+    }
+  }
+</style>
+
+<div class="blog-detail-container">
+  <!-- Blog Header -->
+  <div class="blog-header">
+    <h1 class="blog-title">{{ blog.title }}</h1>
+    <div class="blog-meta">
+      <span><i class="bi bi-person"></i> {{ blog.author.get_full_name|default:blog.author.username }}</span>
+      <span><i class="bi bi-calendar3"></i> {{ blog.created_at|date:"F d, Y" }}</span>
+      <span><i class="bi bi-clock"></i> {{ blog.created_at|timesince }} ago</span>
     </div>
+  </div>
+
+  <!-- Blog Image -->
+  {% if blog.image %}
+    <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="blog-image">
+  {% endif %}
+
+  <!-- Blog Content -->
+  <div class="blog-content">
+    {{ blog.content|linebreaks }}
+  </div>
+
+  <!-- Blog Tags -->
+  {% if blog.tags.all %}
+    <div class="blog-tags">
+      {% for tag in blog.tags.all %}
+        <span class="blog-tag">{{ tag.name }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Comments Section -->
+  <div class="comments-section">
+    <h3 class="comments-title">
+      <i class="bi bi-chat-dots"></i>
+      Comments ({{ comments.count }})
+    </h3>
+
+    <!-- Comment Form -->
+    {% if user.is_authenticated %}
+      <div class="comment-form">
+        <h4>Add a Comment</h4>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            {{ comment_form.comment }}
+            {% if comment_form.comment.errors %}
+              <div class="text-danger mt-1">
+                {% for error in comment_form.comment.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          <button type="submit" class="btn btn-comment">
+            <i class="bi bi-send"></i> Post Comment
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <div class="login-prompt">
+        <i class="bi bi-lock"></i>
+        <p>Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
+      </div>
+    {% endif %}
+
+    <!-- Comments List -->
+    <div class="comments-list">
+      {% if comments %}
+        {% for comment in comments %}
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">{{ comment.user.get_full_name|default:comment.user.username }}</span>
+              <span class="comment-date">{{ comment.created_at|timesince }} ago</span>
+            </div>
+            <div class="comment-text">
+              {{ comment.comment|linebreaks }}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-comments">
+          <i class="bi bi-chat"></i>
+          <h4>No comments yet</h4>
+          <p>Be the first to share your thoughts!</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %} 

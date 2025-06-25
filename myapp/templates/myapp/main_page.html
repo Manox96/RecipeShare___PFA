@@ -781,7 +781,7 @@
       <i class="bi bi-stars me-1"></i>All Types
     </a>
     {% for meal_type in meal_types %}
-      <a href="#" class="chip {% if selected_meal_type == meal_type.id %}active{% endif %}">
+      <a href="?meal_type={{ meal_type.id }}#recipes-section" class="chip {% if selected_meal_type == meal_type.id %}active{% endif %}">
         {{ meal_type.name }}
       </a>
     {% endfor %}
@@ -881,7 +881,7 @@
   <ul class="pagination justify-content-center custom-pagination">
     {% if recipes.has_previous %}
     <li class="page-item">
-      <a class="page-link" href="?page={{ recipes.previous_page_number }}#recipes-section" aria-label="Previous">
+      <a class="page-link" href="?page={{ recipes.previous_page_number }}{% if selected_meal_type %}&meal_type={{ selected_meal_type }}{% endif %}#recipes-section" aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
       </a>
     </li>
@@ -895,13 +895,13 @@
     {% if recipes.number == num %}
     <li class="page-item active"><span class="page-link">{{ num }}</span></li>
     {% else %}
-          <li class="page-item"><a class="page-link" href="?page={{ num }}#recipes-section">{{ num }}</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ num }}{% if selected_meal_type %}&meal_type={{ selected_meal_type }}{% endif %}#recipes-section">{{ num }}</a></li>
         {% endif %}
       {% endfor %}
 
       {% if recipes.has_next %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ recipes.next_page_number }}#recipes-section" aria-label="Next">
+          <a class="page-link" href="?page={{ recipes.next_page_number }}{% if selected_meal_type %}&meal_type={{ selected_meal_type }}{% endif %}#recipes-section" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>

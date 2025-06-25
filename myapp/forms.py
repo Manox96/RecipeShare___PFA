@@ -1,5 +1,6 @@
 from django import forms
-from .models import Photo, Recipe, RecipeIngredient, Step, Tag, Blog
+from django.contrib.auth.models import User
+from .models import Photo, Recipe, RecipeIngredient, Step, Tag, Blog, Profile, BlogComment
 
 class PhotoUploadForm(forms.ModelForm):
     class Meta:
@@ -134,8 +135,58 @@ class BlogForm(forms.ModelForm):
             'image': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
+class BlogCommentForm(forms.ModelForm):
+    class Meta:
+        model = BlogComment
+        fields = ['comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Share your thoughts...',
+                'style': 'resize: vertical;'
+            }),
+        }
+        labels = {
+            'comment': 'Your Comment'
+        }
+
 class ContactForm(forms.Form):
     name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
     subject = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5})) 
+    message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
+
+class ProfileForm(forms.ModelForm):
+    email = forms.EmailField(required=True, label='Email')
+    password1 = forms.CharField(
+        label='New Password',
+        widget=forms.PasswordInput,
+        required=False
+    )
+    password2 = forms.CharField(
+        label='Confirm New Password',
+        widget=forms.PasswordInput,
+        required=False
+    )
+
+    class Meta:
+        model = Profile
+        fields = ['avatar']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['email'].initial = user.email
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        if password1 or password2:
+            if password1 != password2:
+                raise forms.ValidationError('Passwords do not match.')
+            if password1 and len(password1) < 8:
+                raise forms.ValidationError('Password must be at least 8 characters long.')
+        return cleaned_data 

@@ -5,8 +5,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
-from .models import Photo, Recipe, Difficulty, Cuisine, MealType, Ingredient, Unit, RecipeIngredient, Step, Favorite, Tag, Blog
-from .forms import PhotoUploadForm, RecipeForm, RecipeIngredientFormSet, StepFormSet, BlogForm, ContactForm
+from .models import Photo, Recipe, Difficulty, Cuisine, MealType, Ingredient, Unit, RecipeIngredient, Step, Favorite, Tag, Blog, Profile, BlogComment
+from .forms import PhotoUploadForm, RecipeForm, RecipeIngredientFormSet, StepFormSet, BlogForm, ContactForm, ProfileForm, BlogCommentForm
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.http import JsonResponse
@@ -647,11 +647,44 @@ def create_blog(request):
 
 def blog_detail(request, blog_id):
     blog = get_object_or_404(Blog, id=blog_id)
+    comments = blog.comments.all()
+    
+    if request.method == 'POST' and request.user.is_authenticated:
+        comment_form = BlogCommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.user = request.user
+            comment.blog = blog
+            comment.save()
+            messages.success(request, 'Comment added successfully!')
+            return redirect('blog_detail', blog_id=blog.id)
+    else:
+        comment_form = BlogCommentForm()
+    
     context = {
         'blog': blog,
+        'comments': comments,
+        'comment_form': comment_form,
         'title': blog.title,
     }
     return render(request, 'myapp/blog_detail.html', context)
+
+@login_required(login_url='login')
+def add_blog_comment(request, blog_id):
+    blog = get_object_or_404(Blog, id=blog_id)
+    
+    if request.method == 'POST':
+        form = BlogCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.blog = blog
+            comment.save()
+            messages.success(request, 'Comment added successfully!')
+        else:
+            messages.error(request, 'Please correct the errors in your comment.')
+    
+    return redirect('blog_detail', blog_id=blog.id)
 
 def contact(request):
     if request.method == 'POST':
@@ -856,4 +889,31 @@ def delete_ingredient(request, ingredient_id):
         ingredient.delete()
         messages.success(request, 'Ingredient deleted successfully!')
         return redirect('manage_ingredients')
-    return render(request, 'myapp/delete_ingredient.html', {'ingredient': ingredient}) 
+    return render(request, 'myapp/delete_ingredient.html', {'ingredient': ingredient})
+
+@login_required(login_url='login')
+def profile_view(request):
+    user = request.user
+    profile, created = Profile.objects.get_or_create(user=user)
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile, user=user)
+        if form.is_valid():
+            # Update avatar
+            form.save()
+            # Update email
+            email = form.cleaned_data.get('email')
+            if email and email != user.email:
+                user.email = email
+                user.save()
+            # Update password
+            password1 = form.cleaned_data.get('password1')
+            if password1:
+                user.set_password(password1)
+                user.save()
+                # Re-authenticate after password change
+                login(request, user)
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
+    else:
+        form = ProfileForm(instance=profile, user=user)
+    return render(request, 'myapp/profile.html', {'form': form, 'profile': profile}) 

@@ -10,4 +10,9 @@ def startswith(value, arg):
 @register.filter
 def filter_by_user(photos, user):
     """Filter photos by user"""
-    return [photo for photo in photos if photo.user == user] 
+    return [photo for photo in photos if photo.user == user]
+
+@register.filter
+def add_class(field, css_class):
+    """Add a CSS class to a form field"""
+    return field.as_widget(attrs={"class": css_class}) 

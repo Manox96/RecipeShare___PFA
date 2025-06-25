@@ -6,237 +6,418 @@
 
 {% block main_content %}
 <style>
-  .photo-card {
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .recipe-card {
     background: #fff;
-    border-radius: 2rem;
-    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
-    transition: transform 0.3s, box-shadow 0.3s;
-    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.04);
     overflow: hidden;
-    margin-bottom: 1.5rem;
+    position: relative;
   }
-  .photo-card:hover {
-    box-shadow: 0 12px 36px rgba(80, 80, 180, 0.18) !important;
-    transform: translateY(-4px) scale(1.03);
+  
+  .recipe-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    border-color: rgba(247, 179, 43, 0.2);
   }
-  .card-img-top {
-    border-radius: 2rem 2rem 0 0;
-    height: 250px;
+  
+  .recipe-image-container {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+  }
+  
+  .recipe-image {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    transition: filter 0.2s;
+    transition: transform 0.4s ease;
   }
-  .photo-card:hover .card-img-top {
-    filter: brightness(0.92) blur(1px);
+  
+  .recipe-card:hover .recipe-image {
+    transform: scale(1.05);
   }
-  .card-title {
+  
+  .recipe-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    color: #18181b;
+    padding: 0.4rem 0.8rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .recipe-content {
+    padding: 1.5rem;
+  }
+  
+  .recipe-title {
+    font-size: 1.3rem;
     font-weight: 800;
-    font-size: 1.2rem;
     color: #18181b;
     margin-bottom: 0.5rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
-  .card-text {
-    color: #444;
+  
+  .recipe-description {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .recipe-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: #888;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  
+  .meta-item i {
+    color: #f7b32b;
     font-size: 1rem;
-    margin-bottom: 1rem;
   }
-  .action-buttons {
+  
+  .recipe-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .action-row {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
   }
-  .action-buttons .btn {
+  
+  .btn-recipe {
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.8rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    flex: 1;
     justify-content: center;
-    padding: 0.5rem 1rem;
-    font-size: 0.95rem;
+    min-width: 0;
+  }
+  
+  .btn-primary-recipe {
+    background: linear-gradient(135deg, #18181b 0%, #2d2d30 100%);
+    color: #fff;
+  }
+  
+  .btn-primary-recipe:hover {
+    background: linear-gradient(135deg, #f7b32b 0%, #ff8c42 100%);
+    color: #18181b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(247, 179, 43, 0.3);
+  }
+  
+  .btn-edit-recipe {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #fff;
+  }
+  
+  .btn-edit-recipe:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-visibility {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+  }
+  
+  .btn-visibility.private {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  }
+  
+  .btn-visibility:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+  
+  .btn-delete-recipe {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #fff;
+  }
+  
+  .btn-delete-recipe:hover {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+  
+  .btn-favorite-recipe {
+    background: #fff;
+    border: 2px solid #f7b32b;
+    color: #f7b32b;
+  }
+  
+  .btn-favorite-recipe:hover,
+  .btn-favorite-recipe.active {
+    background: linear-gradient(135deg, #f7b32b 0%, #ff8c42 100%);
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(247, 179, 43, 0.3);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .empty-state i {
+    font-size: 4rem;
+    color: #f7b32b;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+  }
+  
+  .empty-state h3 {
+    color: #18181b;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-state p {
+    color: #666;
+    font-size: 1.1rem;
+  }
+  
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+  }
+  
+  .pagination {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .page-link {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    color: #18181b;
+    padding: 0.7rem 1rem;
+    border-radius: 0.8rem;
+    text-decoration: none;
     font-weight: 600;
-    border-radius: 1rem;
     transition: all 0.2s ease;
-    min-width: auto;
-    white-space: nowrap;
+    min-width: 2.5rem;
+    text-align: center;
   }
-  .action-buttons .btn i {
-    font-size: 1rem;
-    margin-right: 0.5rem;
+  
+  .page-link:hover {
+    background: #f7b32b;
+    border-color: #f7b32b;
+    color: #18181b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(247, 179, 43, 0.3);
   }
-  .btn-primary {
-    background: #18181b;
-    border: none;
+  
+  .page-item.active .page-link {
+    background: linear-gradient(135deg, #f7b32b 0%, #ff8c42 100%);
+    border-color: #f7b32b;
     color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(247, 179, 43, 0.3);
   }
-  .btn-primary:hover {
-    background: #232326;
-    transform: translateY(-1px);
-    box-shadow: 4px 8px rgba(0,0,0,0.1);
-  }
-  .btn-favorite {
-    background: #fff;
-    border: 1px solid #ffc107;
-    color: #ffc107;
-    box-shadow: 0 2px 4px rgba(255,193,7,0.1);
-  }
-  .btn-favorite:hover, .btn-favorite.active {
-    background: #ffc107;
-    color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(255,193,7,0.2);
-  }
-  .btn-danger {
-    background: #fff;
-    border: 1px solid #dc3545;
-    color: #dc3545;
-    box-shadow: 0 2px 4px rgba(220,53,69,0.1);
-  }
-  .btn-danger:hover {
-    background: #dc3545;
-    color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(220,53,69,0.2);
-  }
-  .btn-info {
-    background: #18181b;
-    border: none;
-    color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  .btn-info:hover {
-    background: #232326;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-  .badge {
-    font-size: 0.95rem;
-    font-weight: 500;
-    border-radius: 1rem;
-    padding: 0.4rem 1rem;
-  }
-  .photo-card .card-body {
-    padding: 1.5rem;
-  }
-  .card-footer {
-    background: transparent;
-    border-top: 1px solid rgba(0,0,0,0.05);
-    padding: 1rem 1.5rem;
-  }
-  .text-muted {
-    font-size: 0.85rem;
+  
+  @media (max-width: 768px) {
+    .recipe-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .recipe-content {
+      padding: 1.2rem;
+    }
+    
+    .recipe-title {
+      font-size: 1.2rem;
+    }
+    
+    .action-row {
+      flex-direction: column;
+    }
+    
+    .btn-recipe {
+      width: 100%;
+    }
   }
 </style>
-<div class="row g-4">
+
+<div class="recipe-grid">
   {% for recipe in recipes %}
-  <div class="col-md-4">
-    <div class="photo-card h-100 position-relative">
-      <div class="position-relative overflow-hidden">
-        {% if recipe.image %}
-          <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
-          <div class="position-absolute top-0 end-0 m-3">
-            <span class="badge bg-primary bg-opacity-75">
-              <i class="bi bi-calendar3 me-1"></i>{{ recipe.created_at|date:"d/m/Y" }}
-            </span>
-          </div>
-        {% else %}
-          <div class="card-img-top bg-light text-center py-5" style="height: 250px;">
-            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-            <p class="text-muted mt-2">No image available</p>
-          </div>
-        {% endif %}
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">{{ recipe.title }}</h5>
-        <p class="card-text">{{ recipe.description|truncatewords:15 }}</p>
-      </div>
-      <div class="card-footer">
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="action-buttons">
-            <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary">
-              <i class="bi bi-eye"></i>View
-            </a>
-            {% if request.user == recipe.user %}
-            <a href="{% url 'update_recipe' recipe.id %}" class="btn btn-info">
-              <i class="bi bi-pencil"></i>Edit
-            </a>
-            <form method="post" action="{% url 'toggle_recipe_visibility' recipe.id %}" class="d-inline">
-              {% csrf_token %}
-              <button type="submit" class="btn {% if recipe.is_public %}btn-success{% else %}btn-secondary{% endif %}">
-                <i class="bi {% if recipe.is_public %}bi-eye-fill{% else %}bi-eye-slash-fill{% endif %}"></i>
-                {% if recipe.is_public %}Public{% else %}Private{% endif %}
-              </button>
-            </form>
-            <form method="post" action="{% url 'delete_recipe' recipe.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this recipe?');">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger">
-                <i class="bi bi-trash"></i>Delete
-              </button>
-            </form>
-            {% endif %}
-            {% if request.user.is_authenticated %}
-            <a href="{% url 'toggle_favorite_recipe' recipe.id %}" class="btn btn-favorite {% if recipe.id in all_user_favorite %}active{% endif %}">
-              <i class="bi {% if recipe.id in all_user_favorite %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
-              {% if recipe.id in all_user_favorite %}Remove from Favorites{% else %}Add to Favorites{% endif %}
-            </a>
-            {% endif %}
-          </div>
-          <div class="text-muted">
-            <i class="bi bi-clock me-1"></i>{{ recipe.created_at|timesince }}
-          </div>
+  <div class="recipe-card">
+    <div class="recipe-image-container">
+      {% if recipe.image %}
+        <img src="{{ recipe.image.url }}" class="recipe-image" alt="{{ recipe.title }}">
+      {% else %}
+        <div class="recipe-image" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); display: flex; align-items: center; justify-content: center;">
+          <i class="bi bi-image text-muted" style="font-size: 3rem; opacity: 0.5;"></i>
         </div>
+      {% endif %}
+      
+      <div class="recipe-badge">
+        <i class="bi bi-calendar3 me-1"></i>
+        {{ recipe.created_at|date:"M d" }}
+      </div>
+    </div>
+    
+    <div class="recipe-content">
+      <h3 class="recipe-title">{{ recipe.title }}</h3>
+      <p class="recipe-description">{{ recipe.description|truncatewords:20 }}</p>
+      
+      <div class="recipe-meta">
+        <div class="meta-item">
+          <i class="bi bi-clock"></i>
+          <span>{{ recipe.prep_time|add:recipe.cook_time }} min</span>
+        </div>
+        <div class="meta-item">
+          <i class="bi bi-people"></i>
+          <span>{{ recipe.servings }} servings</span>
+        </div>
+        <div class="meta-item">
+          <i class="bi bi-star"></i>
+          <span>{{ recipe.difficulty.name }}</span>
+        </div>
+      </div>
+      
+      <div class="recipe-actions">
+        <div class="action-row">
+          <a href="{% url 'recipe_detail' recipe.id %}" class="btn-recipe btn-primary-recipe">
+            <i class="bi bi-eye"></i>
+            View Recipe
+          </a>
+          {% if request.user.is_authenticated %}
+          <a href="{% url 'toggle_favorite_recipe' recipe.id %}" class="btn-recipe btn-favorite-recipe {% if recipe.id in all_user_favorite %}active{% endif %}">
+            <i class="bi {% if recipe.id in all_user_favorite %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+            {% if recipe.id in all_user_favorite %}Saved{% else %}Save{% endif %}
+          </a>
+          {% endif %}
+        </div>
+        
+        {% if request.user == recipe.user %}
+        <div class="action-row">
+          <a href="{% url 'update_recipe' recipe.id %}" class="btn-recipe btn-edit-recipe">
+            <i class="bi bi-pencil"></i>
+            Edit
+          </a>
+          <form method="post" action="{% url 'toggle_recipe_visibility' recipe.id %}" class="d-inline" style="flex: 1;">
+            {% csrf_token %}
+            <button type="submit" class="btn-recipe btn-visibility {% if not recipe.is_public %}private{% endif %}">
+              <i class="bi {% if recipe.is_public %}bi-eye-fill{% else %}bi-eye-slash-fill{% endif %}"></i>
+              {% if recipe.is_public %}Public{% else %}Private{% endif %}
+            </button>
+          </form>
+          <form method="post" action="{% url 'delete_recipe' recipe.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this recipe?');" style="flex: 1;">
+            {% csrf_token %}
+            <button type="submit" class="btn-recipe btn-delete-recipe">
+              <i class="bi bi-trash"></i>
+              Delete
+            </button>
+          </form>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
   {% empty %}
-  <div class="col-12">
-    <div class="text-center py-5">
-      <i class="bi bi-emoji-smile text-muted" style="font-size: 3rem;"></i>
-      <p class="text-muted mt-3">No recipes available yet. Be the first to share your recipe!</p>
-    </div>
+  <div class="empty-state">
+    <i class="bi bi-emoji-smile"></i>
+    <h3>No Recipes Yet</h3>
+    <p>Start your culinary journey by creating your first recipe!</p>
   </div>
   {% endfor %}
 </div>
 
 {% if recipes.paginator.num_pages > 1 %}
-<nav aria-label="Page navigation" class="mt-4">
-  <ul class="pagination justify-content-center">
-    {% if recipes.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?page=1" aria-label="First" style="background: #18181b; border: none; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 1rem; margin: 0 0.2rem; padding: 0.5rem 1rem;">
-          <span aria-hidden="true">&laquo;&laquo;</span>
-        </a>
-      </li>
-      <li class="page-item">
-        <a class="page-link" href="?page={{ recipes.previous_page_number }}" aria-label="Previous" style="background: #18181b; border: none; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 1rem; margin: 0 0.2rem; padding: 0.5rem 1rem;">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-    {% endif %}
-
-    {% for num in recipes.paginator.page_range %}
-      {% if recipes.number == num %}
-        <li class="page-item active">
-          <span class="page-link" style="background: #232326; border: none; color: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 1rem; margin: 0 0.2rem; padding: 0.5rem 1rem;">{{ num }}</span>
-        </li>
-      {% elif num > recipes.number|add:'-3' and num < recipes.number|add:'3' %}
+<div class="pagination-container">
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if recipes.has_previous %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ num }}" style="background: #18181b; border: none; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 1rem; margin: 0 0.2rem; padding: 0.5rem 1rem;">{{ num }}</a>
+          <a class="page-link" href="?page=1" aria-label="First">
+            <i class="bi bi-chevron-double-left"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ recipes.previous_page_number }}" aria-label="Previous">
+            <i class="bi bi-chevron-left"></i>
+          </a>
         </li>
       {% endif %}
-    {% endfor %}
 
-    {% if recipes.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ recipes.next_page_number }}" aria-label="Next" style="background: #18181b; border: none; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 1rem; margin: 0 0.2rem; padding: 0.5rem 1rem;">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-      <li class="page-item">
-        <a class="page-link" href="?page={{ recipes.paginator.num_pages }}" aria-label="Last" style="background: #18181b; border: none; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 1rem; margin: 0 0.2rem; padding: 0.5rem 1rem;">
-          <span aria-hidden="true">&raquo;&raquo;</span>
-        </a>
-      </li>
-    {% endif %}
-  </ul>
-</nav>
+      {% for num in recipes.paginator.page_range %}
+        {% if recipes.number == num %}
+          <li class="page-item active">
+            <span class="page-link">{{ num }}</span>
+          </li>
+        {% elif num > recipes.number|add:'-3' and num < recipes.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if recipes.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ recipes.next_page_number }}" aria-label="Next">
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ recipes.paginator.num_pages }}" aria-label="Last">
+            <i class="bi bi-chevron-double-right"></i>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
 {% endif %}
 
 {% endblock %} 

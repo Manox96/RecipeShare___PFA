@@ -32,6 +32,7 @@ urlpatterns = [
     path('blogs/', views.blog_list, name='blog_list'),
     path('blog/<int:blog_id>/', views.blog_detail, name='blog_detail'),
     path('blog/create/', views.create_blog, name='create_blog'),
+    path('blog/<int:blog_id>/comment/', views.add_blog_comment, name='add_blog_comment'),
     path('contact/', views.contact, name='contact'),
     path('home/', views.home, name='home'),
     path('manage/tags/', views.manage_tags, name='manage_tags'),
@@ -40,4 +41,5 @@ urlpatterns = [
     path('manage/tags/<int:tag_id>/delete/', views.delete_tag, name='delete_tag'),
     path('manage/ingredients/<int:ingredient_id>/update/', views.update_ingredient, name='update_ingredient'),
     path('manage/ingredients/<int:ingredient_id>/delete/', views.delete_ingredient, name='delete_ingredient'),
+    path('profile/', views.profile_view, name='profile'),
 ] 

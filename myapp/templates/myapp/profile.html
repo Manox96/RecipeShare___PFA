@@ -1,0 +1,128 @@
+{% extends 'myapp/layout.html' %}
+{% load custom_filters %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block main_content %}
+<style>
+  body, .main-content {
+    background: #f8f6f2 !important;
+  }
+  .profile-card {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 2.5rem 2.2rem 2rem 2.2rem;
+    width: 100%;
+    max-width: 420px;
+    margin: 2.5rem auto 2rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 2px 12px rgba(247,179,43,0.10);
+    border: 4px solid #f8f6f2;
+    background: #f8f6f2;
+  }
+  .profile-title {
+    font-weight: 900;
+    font-size: 2rem;
+    color: #18181b;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  .profile-form .form-label {
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 0.25rem;
+  }
+  .profile-form .form-control {
+    border-radius: 1.1rem;
+    border: 1.5px solid #eee;
+    background: #f8f9fb;
+    font-size: 1.08rem;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.1rem;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .profile-form .form-control:focus {
+    border-color: #f7b32b;
+    box-shadow: 0 0 0 2px #f7b32b33;
+    background: #fff;
+  }
+  .btn-profile {
+    background: #18181b;
+    color: #fff;
+    border: none;
+    border-radius: 1.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    padding: 0.85rem 0;
+    margin-top: 0.2rem;
+    margin-bottom: 0.7rem;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  .btn-profile:hover, .btn-profile:focus {
+    background: #f7b32b;
+    color: #18181b;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  }
+  @media (max-width: 600px) {
+    .profile-card {
+      padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+      border-radius: 1.2rem;
+    }
+  }
+</style>
+<div class="profile-card">
+    <div class="profile-title">My Profile</div>
+    <form method="post" enctype="multipart/form-data" class="profile-form w-100">
+        {% csrf_token %}
+        <div class="mb-3 text-center">
+            {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}" alt="Avatar" class="profile-avatar">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" alt="Avatar" class="profile-avatar">
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">{{ form.avatar.label }}</label>
+            {{ form.avatar|add_class:'form-control' }}
+            {% if form.avatar.errors %}
+                <div class="text-danger small">{{ form.avatar.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">{{ form.email.label }}</label>
+            {{ form.email|add_class:'form-control' }}
+            {% if form.email.errors %}
+                <div class="text-danger small">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">{{ form.password1.label }}</label>
+            {{ form.password1|add_class:'form-control' }}
+            {% if form.password1.errors %}
+                <div class="text-danger small">{{ form.password1.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">{{ form.password2.label }}</label>
+            {{ form.password2|add_class:'form-control' }}
+            {% if form.password2.errors %}
+                <div class="text-danger small">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn-profile">Update Profile</button>
+    </form>
+</div>
+{% endblock %} 

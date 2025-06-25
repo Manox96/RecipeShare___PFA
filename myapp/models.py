@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 import pycountry
 import country_converter as coco
+from django.conf import settings
 
 # Create your models here.
 class Photo(models.Model) :
@@ -57,12 +58,6 @@ class MealType(models.Model):
     def __str__(self):
         return self.name
 
-class Diet(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    def __str__(self):
-        return self.name
-
 class Ingredient(models.Model):
     name = models.CharField(max_length=100, unique=True)
     
@@ -99,13 +94,6 @@ class Recipe(models.Model):
     
     def __str__(self):
         return self.title
-
-class RecipeDiet(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    diet = models.ForeignKey(Diet, on_delete=models.PROTECT)
-
-    class Meta:
-        unique_together = ('recipe', 'diet')
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingredients')
@@ -170,5 +158,29 @@ class Blog(models.Model):
 
     def __str__(self):
         return self.title
+
+class BlogComment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='comments')
+    comment = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['blog']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f'Comment by {self.user.username} on {self.blog.title}'
+
+class Profile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    
+    def __str__(self):
+        return f"Profile of {self.user.username}"
     
     
