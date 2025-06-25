@@ -1,0 +1,268 @@
+VISUAL USE CASE TEMPLATE - RECIPE SHARE
+=======================================
+
+📋 QUICK REFERENCE FOR UML DIAGRAM CREATION
+==========================================
+
+🎭 ACTORS (Acteurs)
+===================
+
+1. UTILISATEUR INVITÉ (Guest User)
+   - S'inscrire
+   - Se connecter
+   - Parcourir les recettes publiques
+   - Voir les détails d'une recette
+   - Voir les articles de blog
+   - Contacter le support
+   - Voir les conseils de cuisine
+
+2. UTILISATEUR INSCRIT (Registered User)
+   - Se déconnecter
+   - Voir son profil
+   - Modifier son profil
+   - Télécharger un avatar
+   - Parcourir les recettes publiques
+   - Voir les détails d'une recette
+   - Créer une recette
+   - Modifier ses recettes
+   - Supprimer ses recettes
+   - Ajouter une image à sa recette
+   - Définir la visibilité de sa recette
+   - Ajouter une recette aux favoris
+   - Voir ses recettes favorites
+   - Retirer une recette des favoris
+   - Ajouter un commentaire
+   - Voir les commentaires
+   - Voir les articles de blog
+   - Télécharger une photo
+   - Voir ses photos
+   - Supprimer ses photos
+   - Ajouter une photo aux favoris
+   - Voir ses photos favorites
+   - Contacter le support
+   - Voir les conseils de cuisine
+
+3. ADMINISTRATEUR (Admin User)
+   - Gérer les utilisateurs
+   - Modifier les détails d'un utilisateur
+   - Supprimer un utilisateur
+   - Voir les recettes d'un utilisateur
+   - Créer un article de blog
+   - Modifier un article de blog
+   - Supprimer un article de blog
+   - Ajouter une image à un article
+   - Ajouter des étiquettes à un article
+   - Contacter le support
+   - Voir les statistiques des recettes
+   - Exporter les données de recettes
+   - Sauvegarder les données utilisateur
+   - Gérer les étiquettes
+   - Créer une étiquette
+   - Modifier une étiquette
+   - Supprimer une étiquette
+   - Gérer les ingrédients
+   - Créer un ingrédient
+   - Modifier un ingrédient
+   - Supprimer un ingrédient
+   - Gérer les unités
+
+🔗 RELATIONS INCLUDE/EXTEND
+==========================
+
+INCLUDE RELATIONS:
+- "Voir les détails d'une recette" INCLUDE "Parcourir les recettes"
+- "Créer une recette" INCLUDE "Ajouter des ingrédients"
+- "Créer une recette" INCLUDE "Ajouter des étapes"
+- "Créer une recette" INCLUDE "Ajouter des étiquettes"
+- "Modifier une recette" INCLUDE "Ajouter des ingrédients"
+- "Modifier une recette" INCLUDE "Ajouter des étapes"
+- "Modifier une recette" INCLUDE "Ajouter des étiquettes"
+- "Créer un article de blog" INCLUDE "Ajouter des étiquettes"
+
+EXTEND RELATIONS:
+- "Ajouter aux favoris" EXTEND "Voir les détails d'une recette"
+- "Ajouter un commentaire" EXTEND "Voir les détails d'une recette"
+- "Ajouter une photo aux favoris" EXTEND "Voir ses photos"
+
+🎨 VISUAL DIAGRAM STRUCTURE
+===========================
+
+SYSTEM BOUNDARY: "Système Recipe Share"
+
+PACKAGES (Groupes logiques):
+1. "Authentification & Profil"
+2. "Gestion des Recettes"
+3. "Fonctionnalités Sociales"
+4. "Gestion Administrative"
+5. "Système de Blog"
+6. "Gestion des Médias"
+
+📊 SIMPLIFIED USE CASE LIST FOR DIAGRAM
+=======================================
+
+AUTHENTIFICATION & PROFIL:
+- S'inscrire
+- Se connecter
+- Se déconnecter
+- Voir son profil
+- Modifier son profil
+- Télécharger un avatar
+
+GESTION DES RECETTES:
+- Parcourir les recettes publiques
+- Voir les détails d'une recette
+- Créer une recette
+- Modifier ses recettes
+- Supprimer ses recettes
+- Ajouter une image à sa recette
+- Définir la visibilité de sa recette
+
+FONCTIONNALITÉS SOCIALES:
+- Ajouter aux favoris
+- Voir ses recettes favorites
+- Retirer des favoris
+- Ajouter un commentaire
+- Voir les commentaires
+
+GESTION ADMINISTRATIVE:
+- Gérer les utilisateurs
+- Modifier les détails d'un utilisateur
+- Supprimer un utilisateur
+- Voir les recettes d'un utilisateur
+- Gérer les étiquettes
+- Gérer les ingrédients
+- Voir les statistiques
+
+SYSTÈME DE BLOG:
+- Voir les articles de blog
+- Créer un article de blog
+- Modifier un article de blog
+- Supprimer un article de blog
+
+GESTION DES MÉDIAS:
+- Télécharger une photo
+- Voir ses photos
+- Supprimer ses photos
+- Ajouter une photo aux favoris
+
+COMMUNICATION:
+- Contacter le support
+- Voir les conseils de cuisine
+
+🔧 PLANTUML TEMPLATE
+===================
+
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+skinparam actor {
+    BackgroundColor LightGreen
+    BorderColor DarkGreen
+}
+
+' Actors
+:Utilisateur Invité: as GU
+:Utilisateur Inscrit: as RU
+:Administrateur: as AU
+
+rectangle "Système Recipe Share" {
+    package "Authentification & Profil" {
+        (S'inscrire) as UC1
+        (Se connecter) as UC2
+        (Se déconnecter) as UC3
+        (Voir son profil) as UC4
+        (Modifier son profil) as UC5
+    }
+    
+    package "Gestion des Recettes" {
+        (Parcourir les recettes) as UC6
+        (Voir les détails) as UC7
+        (Créer une recette) as UC8
+        (Modifier une recette) as UC9
+        (Supprimer une recette) as UC10
+    }
+    
+    package "Fonctionnalités Sociales" {
+        (Ajouter aux favoris) as UC11
+        (Voir ses favoris) as UC12
+        (Ajouter un commentaire) as UC13
+    }
+    
+    package "Gestion Administrative" {
+        (Gérer les utilisateurs) as UC14
+        (Gérer les étiquettes) as UC15
+        (Gérer les ingrédients) as UC16
+    }
+    
+    package "Système de Blog" {
+        (Voir les articles) as UC17
+        (Créer un article) as UC18
+    }
+}
+
+' Guest User associations
+GU --> UC1
+GU --> UC2
+GU --> UC6
+GU --> UC7
+GU --> UC17
+
+' Registered User associations
+RU --> UC3
+RU --> UC4
+RU --> UC5
+RU --> UC6
+RU --> UC7
+RU --> UC8
+RU --> UC9
+RU --> UC10
+RU --> UC11
+RU --> UC12
+RU --> UC13
+RU --> UC17
+
+' Admin User associations
+AU --> UC14
+AU --> UC15
+AU --> UC16
+AU --> UC18
+
+' Include relationships
+UC7 ..> UC6 : <<include>>
+UC8 ..> UC15 : <<include>>
+UC8 ..> UC16 : <<include>>
+
+' Extend relationships
+UC11 ..> UC7 : <<extend>>
+UC13 ..> UC7 : <<extend>>
+
+@enduml
+
+🎯 QUICK DIAGRAM CREATION STEPS
+===============================
+
+1. COPY the PlantUML template above
+2. PASTE into https://www.plantuml.com/plantuml/uml/
+3. CUSTOMIZE by adding/removing use cases
+4. DOWNLOAD as PNG/SVG/PDF
+5. IMPORT into Lucidchart/Draw.io if needed
+
+💡 TIPS FOR VISUAL DIAGRAMS
+==========================
+
+✅ Use consistent colors for actors
+✅ Group related use cases in packages
+✅ Keep the diagram readable (max 20-25 use cases)
+✅ Use clear, concise names
+✅ Show only the most important relationships
+✅ Add notes for complex scenarios
+
+🚀 READY TO USE!
+===============
+
+This template gives you everything needed to create a professional UML use case diagram for your Recipe Share application! 

@@ -698,6 +698,9 @@
           </ul>
           {% if user.is_staff %}
           <nav class="nav flex-column mt-4">
+            <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}">
+              <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
             <a class="nav-link {% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}" href="{% url 'manage_users' %}">
               <i class="bi bi-people-fill"></i> Manage Users
             </a>

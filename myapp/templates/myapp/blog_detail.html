@@ -232,6 +232,18 @@
       <span><i class="bi bi-calendar3"></i> {{ blog.created_at|date:"F d, Y" }}</span>
       <span><i class="bi bi-clock"></i> {{ blog.created_at|timesince }} ago</span>
     </div>
+    
+    <!-- Admin Actions -->
+    {% if user.is_staff %}
+    <div class="admin-actions" style="margin-top: 1rem;">
+      <a href="{% url 'edit_blog' blog.id %}" class="btn btn-warning" style="margin-right: 0.5rem;">
+        <i class="bi bi-pencil"></i> Edit
+      </a>
+      <a href="{% url 'delete_blog' blog.id %}" class="btn btn-danger">
+        <i class="bi bi-trash"></i> Delete
+      </a>
+    </div>
+    {% endif %}
   </div>
 
   <!-- Blog Image -->

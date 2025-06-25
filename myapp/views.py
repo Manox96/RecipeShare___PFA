@@ -10,7 +10,7 @@ from .forms import PhotoUploadForm, RecipeForm, RecipeIngredientFormSet, StepFor
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.db.models import Count
+from django.db.models import Count, Avg
 import datetime
 import pycountry
 import country_converter as coco
@@ -916,4 +916,176 @@ def profile_view(request):
             return redirect('profile')
     else:
         form = ProfileForm(instance=profile, user=user)
-    return render(request, 'myapp/profile.html', {'form': form, 'profile': profile}) 
+    return render(request, 'myapp/profile.html', {'form': form, 'profile': profile})
+
+@login_required(login_url='login')
+@user_passes_test(is_admin, login_url='login')
+def admin_dashboard(request):
+    """Admin dashboard view showing system overview and quick actions"""
+    
+    # Get system statistics
+    total_users = User.objects.count()
+    total_recipes = Recipe.objects.count()
+    total_blogs = Blog.objects.count()
+    total_ingredients = Ingredient.objects.count()
+    total_tags = Tag.objects.count()
+    
+    # Get recent activity
+    recent_users = User.objects.order_by('-date_joined')[:5]
+    recent_recipes = Recipe.objects.order_by('-created_at')[:5]
+    recent_blogs = Blog.objects.order_by('-created_at')[:5]
+    
+    # Get admin statistics
+    admin_users = User.objects.filter(is_staff=True).count()
+    active_users = User.objects.filter(is_active=True).count()
+    public_recipes = Recipe.objects.filter(is_public=True).count()
+    
+    context = {
+        'title': 'Admin Dashboard',
+        'total_users': total_users,
+        'total_recipes': total_recipes,
+        'total_blogs': total_blogs,
+        'total_ingredients': total_ingredients,
+        'total_tags': total_tags,
+        'recent_users': recent_users,
+        'recent_recipes': recent_recipes,
+        'recent_blogs': recent_blogs,
+        'admin_users': admin_users,
+        'active_users': active_users,
+        'public_recipes': public_recipes,
+    }
+    
+    return render(request, 'myapp/admin_dashboard.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(is_admin, login_url='login')
+def export_recipe_data(request):
+    """Export recipe data as CSV"""
+    import csv
+    from django.http import HttpResponse
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="recipes_export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Title', 'Description', 'Difficulty', 'Cuisine', 'Meal Type', 'Prep Time', 'Cook Time', 'Servings', 'User', 'Created At', 'Is Public'])
+    
+    recipes = Recipe.objects.select_related('difficulty', 'cuisine', 'meal_type', 'user').all()
+    for recipe in recipes:
+        writer.writerow([
+            recipe.title,
+            recipe.description,
+            recipe.difficulty.name,
+            recipe.cuisine.name if recipe.cuisine else '',
+            recipe.meal_type.name,
+            recipe.prep_time,
+            recipe.cook_time,
+            recipe.servings,
+            recipe.user.username,
+            recipe.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'Yes' if recipe.is_public else 'No'
+        ])
+    
+    return response
+
+@login_required(login_url='login')
+@user_passes_test(is_admin, login_url='login')
+def backup_user_data(request):
+    """Backup user data as JSON"""
+    import json
+    from django.http import HttpResponse
+    from django.core.serializers import serialize
+    
+    users = User.objects.all()
+    user_data = serialize('json', users, fields=('username', 'email', 'first_name', 'last_name', 'date_joined', 'is_active', 'is_staff'))
+    
+    response = HttpResponse(user_data, content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename="users_backup.json"'
+    
+    return response
+
+@login_required(login_url='login')
+@user_passes_test(is_admin, login_url='login')
+def recipe_statistics(request):
+    """View detailed recipe statistics"""
+    
+    # Get various statistics
+    total_recipes = Recipe.objects.count()
+    public_recipes = Recipe.objects.filter(is_public=True).count()
+    private_recipes = Recipe.objects.filter(is_public=False).count()
+    
+    # Recipes by difficulty
+    difficulty_stats = Recipe.objects.values('difficulty__name').annotate(count=Count('id')).order_by('-count')
+    
+    # Recipes by cuisine
+    cuisine_stats = Recipe.objects.values('cuisine__name').annotate(count=Count('id')).order_by('-count')
+    
+    # Recipes by meal type
+    meal_type_stats = Recipe.objects.values('meal_type__name').annotate(count=Count('id')).order_by('-count')
+    
+    # Top users by recipe count
+    top_users = User.objects.annotate(recipe_count=Count('recipe')).order_by('-recipe_count')[:10]
+    
+    # Recent activity
+    recent_recipes = Recipe.objects.order_by('-created_at')[:10]
+    
+    # Average stats
+    avg_prep_time = Recipe.objects.aggregate(avg_prep=Avg('prep_time'))['avg_prep'] or 0
+    avg_cook_time = Recipe.objects.aggregate(avg_cook=Avg('cook_time'))['avg_cook'] or 0
+    avg_servings = Recipe.objects.aggregate(avg_servings=Avg('servings'))['avg_servings'] or 0
+    
+    context = {
+        'title': 'Recipe Statistics',
+        'total_recipes': total_recipes,
+        'public_recipes': public_recipes,
+        'private_recipes': private_recipes,
+        'difficulty_stats': difficulty_stats,
+        'cuisine_stats': cuisine_stats,
+        'meal_type_stats': meal_type_stats,
+        'top_users': top_users,
+        'recent_recipes': recent_recipes,
+        'avg_prep_time': round(avg_prep_time, 1),
+        'avg_cook_time': round(avg_cook_time, 1),
+        'avg_servings': round(avg_servings, 1),
+    }
+    
+    return render(request, 'myapp/recipe_statistics.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(is_admin, login_url='login')
+def edit_blog(request, blog_id):
+    """Edit an existing blog post"""
+    blog = get_object_or_404(Blog, id=blog_id)
+    
+    if request.method == 'POST':
+        form = BlogForm(request.POST, request.FILES, instance=blog)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Blog post updated successfully!')
+            return redirect('blog_detail', blog_id=blog.id)
+    else:
+        form = BlogForm(instance=blog)
+    
+    context = {
+        'form': form,
+        'blog': blog,
+        'title': 'Edit Blog Post',
+    }
+    return render(request, 'myapp/edit_blog.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(is_admin, login_url='login')
+def delete_blog(request, blog_id):
+    """Delete a blog post"""
+    blog = get_object_or_404(Blog, id=blog_id)
+    
+    if request.method == 'POST':
+        blog.delete()
+        messages.success(request, 'Blog post deleted successfully!')
+        return redirect('blog_list')
+    
+    context = {
+        'blog': blog,
+        'title': 'Delete Blog Post',
+    }
+    return render(request, 'myapp/delete_blog.html', context) 

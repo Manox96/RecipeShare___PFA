@@ -1,0 +1,105 @@
+{% extends 'myapp/layout.html' %}
+{% load custom_filters %}
+
+{% block title %}Delete Blog Post - Admin Dashboard{% endblock %}
+
+{% block main_content %}
+<style>
+  .delete-blog-container {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .warning-icon {
+    font-size: 4rem;
+    color: #ef4444;
+    margin-bottom: 1rem;
+  }
+  .blog-preview {
+    background: #f8f9fb;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    text-align: left;
+  }
+  .blog-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #18181b;
+    margin-bottom: 0.5rem;
+  }
+  .blog-meta {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  .blog-content {
+    color: #444;
+    line-height: 1.6;
+  }
+  .btn-danger {
+    background: #ef4444;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.2s ease;
+  }
+  .btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: #6b7280;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .btn-secondary:hover {
+    background: #4b5563;
+    color: #fff;
+    text-decoration: none;
+  }
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+</style>
+
+<div class="delete-blog-container">
+  <div class="warning-icon">⚠️</div>
+  <h2 class="mb-4">Supprimer l'Article de Blog</h2>
+  
+  <p class="text-muted mb-4">
+    Êtes-vous sûr de vouloir supprimer cet article de blog ? Cette action est irréversible.
+  </p>
+  
+  <div class="blog-preview">
+    <div class="blog-title">{{ blog.title }}</div>
+    <div class="blog-meta">
+      Par {{ blog.author.username }} • {{ blog.created_at|date:"d/m/Y H:i" }}
+    </div>
+    <div class="blog-content">
+      {{ blog.content|truncatewords:50 }}
+    </div>
+  </div>
+  
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+      <button type="submit" class="btn-danger">Oui, Supprimer</button>
+      <a href="{% url 'blog_detail' blog.id %}" class="btn-secondary">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %} 

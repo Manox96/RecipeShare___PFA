@@ -1,0 +1,125 @@
+{% extends 'myapp/layout.html' %}
+{% load custom_filters %}
+
+{% block title %}Edit Blog Post - Admin Dashboard{% endblock %}
+
+{% block main_content %}
+<style>
+  .edit-blog-container {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  .form-label {
+    font-weight: 600;
+    color: #18181b;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .form-control {
+    border-radius: 1rem;
+    border: 1px solid #e5e7eb;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+  .form-control:focus {
+    border-color: #f7b32b;
+    box-shadow: 0 0 0 0.2rem rgba(247, 179, 43, 0.25);
+  }
+  .btn-primary {
+    background: #f7b32b;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    color: #18181b;
+    transition: all 0.2s ease;
+  }
+  .btn-primary:hover {
+    background: #e6a825;
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: #6b7280;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .btn-secondary:hover {
+    background: #4b5563;
+    color: #fff;
+    text-decoration: none;
+  }
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .current-image {
+    max-width: 200px;
+    border-radius: 1rem;
+    margin-top: 0.5rem;
+  }
+</style>
+
+<div class="edit-blog-container">
+  <h2 class="mb-4">✏️ Modifier l'Article de Blog</h2>
+  
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div class="form-group">
+      <label for="{{ form.title.id_for_label }}" class="form-label">Titre</label>
+      {{ form.title|add_class:"form-control" }}
+      {% if form.title.errors %}
+        <div class="text-danger mt-1">{{ form.title.errors.0 }}</div>
+      {% endif %}
+    </div>
+    
+    <div class="form-group">
+      <label for="{{ form.content.id_for_label }}" class="form-label">Contenu</label>
+      {{ form.content|add_class:"form-control" }}
+      {% if form.content.errors %}
+        <div class="text-danger mt-1">{{ form.content.errors.0 }}</div>
+      {% endif %}
+    </div>
+    
+    <div class="form-group">
+      <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
+      {{ form.image|add_class:"form-control" }}
+      {% if blog.image %}
+        <div class="mt-2">
+          <p class="text-muted">Image actuelle:</p>
+          <img src="{{ blog.image.url }}" alt="Current blog image" class="current-image">
+        </div>
+      {% endif %}
+      {% if form.image.errors %}
+        <div class="text-danger mt-1">{{ form.image.errors.0 }}</div>
+      {% endif %}
+    </div>
+    
+    <div class="form-group">
+      <label for="{{ form.tags.id_for_label }}" class="form-label">Étiquettes</label>
+      {{ form.tags|add_class:"form-control" }}
+      {% if form.tags.errors %}
+        <div class="text-danger mt-1">{{ form.tags.errors.0 }}</div>
+      {% endif %}
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Sauvegarder les Modifications</button>
+      <a href="{% url 'blog_detail' blog.id %}" class="btn-secondary">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %} 

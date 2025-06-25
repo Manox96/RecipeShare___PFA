@@ -1,0 +1,277 @@
+{% extends 'myapp/layout.html' %}
+{% load custom_filters %}
+
+{% block title %}Recipe Statistics - Admin Dashboard{% endblock %}
+
+{% block main_content %}
+<style>
+  .stats-container {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat-card {
+    background: linear-gradient(135deg, #f8f9fb 0%, #e9ecef 100%);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+  }
+  .stat-card:hover {
+    transform: translateY(-2px);
+  }
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #18181b;
+    margin-bottom: 0.5rem;
+  }
+  .stat-label {
+    color: #666;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .chart-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  .chart-card {
+    background: #f8f9fb;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .chart-card h4 {
+    color: #18181b;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .chart-card i {
+    color: #f7b32b;
+    font-size: 1.2rem;
+  }
+  .chart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .chart-item:last-child {
+    border-bottom: none;
+  }
+  .chart-label {
+    font-weight: 600;
+    color: #18181b;
+  }
+  .chart-value {
+    background: #f7b32b;
+    color: #18181b;
+    padding: 0.3rem 0.8rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .export-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .btn-export {
+    background: #f7b32b;
+    color: #18181b;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .btn-export:hover {
+    background: #e6a825;
+    color: #18181b;
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+  .recent-recipes {
+    background: #f8f9fb;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .recent-recipes h4 {
+    color: #18181b;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .recent-recipes i {
+    color: #f7b32b;
+    font-size: 1.2rem;
+  }
+  .recipe-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .recipe-item:last-child {
+    border-bottom: none;
+  }
+  .recipe-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f7b32b 0%, #e6a825 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+  }
+  .recipe-info h6 {
+    margin: 0;
+    font-weight: 600;
+    color: #18181b;
+  }
+  .recipe-info p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+</style>
+
+<div class="stats-container">
+  <h2 class="mb-4">📊 Statistiques Détaillées des Recettes</h2>
+  
+  <!-- Export Actions -->
+  <div class="export-actions">
+    <a href="{% url 'export_recipe_data' %}" class="btn-export">
+      <i class="fas fa-download"></i> Exporter les Recettes (CSV)
+    </a>
+    <a href="{% url 'backup_user_data' %}" class="btn-export">
+      <i class="fas fa-database"></i> Sauvegarder les Utilisateurs (JSON)
+    </a>
+  </div>
+
+  <!-- Overview Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ total_recipes }}</div>
+      <div class="stat-label">Total des Recettes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ public_recipes }}</div>
+      <div class="stat-label">Recettes Publiques</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ private_recipes }}</div>
+      <div class="stat-label">Recettes Privées</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ avg_prep_time }} min</div>
+      <div class="stat-label">Temps de Préparation Moyen</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ avg_cook_time }} min</div>
+      <div class="stat-label">Temps de Cuisson Moyen</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ avg_servings }}</div>
+      <div class="stat-label">Portions Moyennes</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-container">
+    <div class="chart-card">
+      <h4><i class="fas fa-chart-bar"></i> Recettes par Difficulté</h4>
+      {% for stat in difficulty_stats %}
+      <div class="chart-item">
+        <span class="chart-label">{{ stat.difficulty__name }}</span>
+        <span class="chart-value">{{ stat.count }}</span>
+      </div>
+      {% empty %}
+      <p class="text-muted">Aucune donnée disponible</p>
+      {% endfor %}
+    </div>
+
+    <div class="chart-card">
+      <h4><i class="fas fa-globe"></i> Recettes par Cuisine</h4>
+      {% for stat in cuisine_stats %}
+      <div class="chart-item">
+        <span class="chart-label">{{ stat.cuisine__name }}</span>
+        <span class="chart-value">{{ stat.count }}</span>
+      </div>
+      {% empty %}
+      <p class="text-muted">Aucune donnée disponible</p>
+      {% endfor %}
+    </div>
+
+    <div class="chart-card">
+      <h4><i class="fas fa-utensils"></i> Recettes par Type de Repas</h4>
+      {% for stat in meal_type_stats %}
+      <div class="chart-item">
+        <span class="chart-label">{{ stat.meal_type__name }}</span>
+        <span class="chart-value">{{ stat.count }}</span>
+      </div>
+      {% empty %}
+      <p class="text-muted">Aucune donnée disponible</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Top Users and Recent Recipes -->
+  <div class="chart-container">
+    <div class="chart-card">
+      <h4><i class="fas fa-users"></i> Top Utilisateurs</h4>
+      {% for user in top_users %}
+      <div class="chart-item">
+        <span class="chart-label">{{ user.username }}</span>
+        <span class="chart-value">{{ user.recipe_count }} recettes</span>
+      </div>
+      {% empty %}
+      <p class="text-muted">Aucun utilisateur trouvé</p>
+      {% endfor %}
+    </div>
+
+    <div class="recent-recipes">
+      <h4><i class="fas fa-clock"></i> Recettes Récentes</h4>
+      {% for recipe in recent_recipes %}
+      <div class="recipe-item">
+        <div class="recipe-avatar">{{ recipe.user.username|first }}</div>
+        <div class="recipe-info">
+          <h6>{{ recipe.title }}</h6>
+          <p>par {{ recipe.user.username }} - {{ recipe.created_at|timesince }} ago</p>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-muted">Aucune recette récente</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %} 
