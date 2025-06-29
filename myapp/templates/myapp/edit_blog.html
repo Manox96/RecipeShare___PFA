@@ -111,6 +111,17 @@
     <div class="form-group">
       <label for="{{ form.tags.id_for_label }}" class="form-label">Étiquettes</label>
       {{ form.tags|add_class:"form-control" }}
+      <div class="form-text">
+        <i class="bi bi-info-circle"></i> 
+        Entrez les étiquettes séparées par des virgules. Étiquettes actuelles: 
+        {% if blog.tags.all %}
+          {% for tag in blog.tags.all %}
+            <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+          {% endfor %}
+        {% else %}
+          <span class="text-muted">Aucune étiquette</span>
+        {% endif %}
+      </div>
       {% if form.tags.errors %}
         <div class="text-danger mt-1">{{ form.tags.errors.0 }}</div>
       {% endif %}

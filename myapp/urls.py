@@ -38,6 +38,7 @@ urlpatterns = [
     path('blog/create/', views.create_blog, name='create_blog'),
     path('blog/<int:blog_id>/edit/', views.edit_blog, name='edit_blog'),
     path('blog/<int:blog_id>/delete/', views.delete_blog, name='delete_blog'),
+    path('blog/comment/<int:comment_id>/delete/', views.delete_blog_comment, name='delete_blog_comment'),
     path('blog/<int:blog_id>/comment/', views.add_blog_comment, name='add_blog_comment'),
     path('contact/', views.contact, name='contact'),
     path('home/', views.home, name='home'),

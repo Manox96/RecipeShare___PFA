@@ -131,19 +131,34 @@
                                 {% for form in step_formset %}
                                     <div class="row mb-2 step-form">
                                         {{ form.id }}
-                                        <div class="col-md-1">
-                                            <input type="number" class="form-control" name="{{ form.step_number.html_name }}" value="{{ form.instance.step_number|default:forloop.counter }}" readonly>
+                                        <div class="col-1 d-flex align-items-center justify-content-center">
+                                            <span class="step-number h5">{{ forloop.counter }}</span>
+                                            <input type="hidden" class="form-control" name="{{ form.step_number.html_name }}" value="{{ form.instance.step_number|default:forloop.counter }}">
                                         </div>
                                         <div class="col-md-9">
                                             <textarea class="form-control" name="{{ form.instruction.html_name }}" rows="2" required>{{ form.instance.instruction }}</textarea>
                                         </div>
-                                        <div class="col-md-2">
-                                            <button type="button" class="btn btn-danger remove-step">Remove</button>
+                                        <div class="col-md-2 d-flex align-items-center">
+                                            <button type="button" class="btn btn-danger remove-step w-100">Remove</button>
                                         </div>
                                     </div>
                                 {% endfor %}
                             </div>
                             <button type="button" class="btn btn-secondary mt-2" id="add-step">Add Step</button>
+                        </div>
+                        <!-- Hidden Step Form Template -->
+                        <div id="empty-step-form" class="hidden">
+                            <div class="row mb-2 step-form">
+                                {{ step_formset.empty_form.id }}
+                                <div class="col-1 d-flex align-items-center justify-content-center">
+                                    <span class="step-number h5"></span>
+                                    {{ step_formset.empty_form.step_number.as_hidden }}
+                                </div>
+                                <div class="col-md-9">{{ step_formset.empty_form.instruction }}</div>
+                                <div class="col-md-2 d-flex align-items-center">
+                                    <button type="button" class="btn btn-danger remove-step w-100">Remove</button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2">
@@ -250,6 +265,7 @@
         const saveNewIngredientBtn = document.getElementById('saveNewIngredient');
         let ingredientFormCount = document.querySelectorAll('.ingredient-form').length;
         let stepFormCount = document.querySelectorAll('.step-form').length;
+        const totalStepForms = document.getElementById('id_steps-TOTAL_FORMS');
 
         // Function to create new ingredient
         async function createNewIngredient(name) {
@@ -397,35 +413,6 @@
             }
         });
 
-        // Add new step form
-        addStepBtn.addEventListener('click', function() {
-            const newForm = stepsContainer.querySelector('.step-form').cloneNode(true);
-            const formRegex = RegExp(`steps-(\\d+)-`,'g');
-            stepFormCount++;
-            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `steps-${stepFormCount}-`);
-            newForm.querySelector('input[type="number"]').value = stepFormCount;
-            newForm.querySelector('textarea').value = '';
-            stepsContainer.appendChild(newForm);
-            updateFormIndexes();
-        });
-
-        // Remove step form
-        stepsContainer.addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-step')) {
-                 const formToRemove = e.target.closest('.step-form');
-                if (document.querySelectorAll('.step-form').length > 1 && formToRemove) {
-                    // Find the DELETE input and set its value to 'on'
-                    const deleteInput = formToRemove.querySelector('input[type="hidden"][name$="-DELETE"]');
-                    if (deleteInput) {
-                        deleteInput.value = 'on';
-                    }
-                    // Hide the form instead of removing it, so its data is still submitted
-                    formToRemove.style.display = 'none';
-                    // updateFormIndexes(); // No need to re-index if just hiding
-                }
-            }
-        });
-
         // Update form indexes and management form counts
         function updateFormIndexes() {
             // Update ingredient form indexes
@@ -447,6 +434,37 @@
             document.getElementById('id_ingredients-TOTAL_FORMS').value = document.querySelectorAll('.ingredient-form').length;
             document.getElementById('id_steps-TOTAL_FORMS').value = document.querySelectorAll('.step-form').length;
         }
+
+        function updateStepNumbers() {
+            const stepForms = stepsContainer.querySelectorAll('.step-form');
+            stepForms.forEach((form, index) => {
+                const stepNumberInput = form.querySelector('input[type="hidden"]');
+                if (stepNumberInput) stepNumberInput.value = index + 1;
+                const stepNumberDisplay = form.querySelector('.step-number');
+                if (stepNumberDisplay) stepNumberDisplay.textContent = index + 1;
+            });
+        }
+
+        addStepBtn.addEventListener('click', function () {
+            let formIdx = parseInt(totalStepForms.value);
+            const newForm = document.getElementById('empty-step-form').firstElementChild.cloneNode(true);
+            newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, formIdx);
+            stepsContainer.appendChild(newForm);
+            totalStepForms.value = formIdx + 1;
+            updateStepNumbers();
+        });
+
+        stepsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-step')) {
+                const formRow = e.target.closest('.step-form');
+                // Hide or remove the form
+                formRow.remove();
+                totalStepForms.value = stepsContainer.querySelectorAll('.step-form').length;
+                updateStepNumbers();
+            }
+        });
+
+        updateStepNumbers(); // Initial call
 
         // Form validation and submission
         form.addEventListener('submit', function(e) {

@@ -46,11 +46,14 @@ def home(request):
 
 def main_page(request):
     meal_type_id = request.GET.get('meal_type')
-    recipes = Recipe.objects.filter(is_public=True).order_by('-created_at')
+    # More explicit filtering: exclude private recipes and ensure is_public is True
+    recipes = Recipe.objects.filter(is_public=True).exclude(is_public=False).order_by('-created_at')
     meal_types = MealType.objects.all()
     
-    # Annotate cuisines with recipe count and flag emoji
-    cuisines = Cuisine.objects.annotate(recipe_count=Count('recipe')).filter(recipe_count__gt=0)
+    # Annotate cuisines with recipe count and flag emoji - only count public recipes
+    cuisines = Cuisine.objects.annotate(
+        recipe_count=Count('recipe', filter=Q(recipe__is_public=True))
+    ).filter(recipe_count__gt=0)
     
     # Helper to get flag emoji from country code
     def country_code_to_emoji(code):
@@ -73,11 +76,14 @@ def main_page(request):
 
     # Additional context for new homepage sections
     categories = Tag.objects.all()
-    popular_recipes = Recipe.objects.filter(is_public=True).order_by('-created_at')[:4]
+    popular_recipes = Recipe.objects.filter(is_public=True).exclude(is_public=False).order_by('-created_at')[:4]
     
-    # Get newly added recipes (last 3 days)
+    # Get newly added recipes (last 3 days) - only public ones
     three_days_ago = timezone.now() - datetime.timedelta(days=300)
-    new_recipes = Recipe.objects.filter(is_public=True, created_at__gte=three_days_ago).order_by('-created_at')
+    new_recipes = Recipe.objects.filter(
+        is_public=True, 
+        created_at__gte=three_days_ago
+    ).exclude(is_public=False).order_by('-created_at')
     
     cooking_tips = [
         "Always taste as you cook.",
@@ -597,7 +603,11 @@ def create_tag(request):
 def recipes_by_cuisine(request, cuisine_id):
     from django.core.paginator import Paginator
     cuisine = get_object_or_404(Cuisine, id=cuisine_id)
-    recipes = Recipe.objects.filter(is_public=True, cuisine=cuisine).order_by('-created_at')
+    # More explicit filtering: exclude private recipes and ensure is_public is True
+    recipes = Recipe.objects.filter(
+        is_public=True, 
+        cuisine=cuisine
+    ).exclude(is_public=False).order_by('-created_at')
     paginator = Paginator(recipes, 9)  # Show 9 recipes per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -625,15 +635,8 @@ def create_blog(request):
             blog = form.save(commit=False)
             blog.author = request.user
             blog.save()
-
-            # Handle tags
-            tag_names = form.cleaned_data.get('tags', '').split(',')
-            for tag_name in tag_names:
-                tag_name = tag_name.strip()
-                if tag_name:
-                    tag, created = Tag.objects.get_or_create(name=tag_name)
-                    blog.tags.add(tag)
-
+            # The form's save method will handle tags automatically
+            form.save()  # This will save the tags
             messages.success(request, 'Blog post created successfully!')
             return redirect('blog_list')
     else:
@@ -1088,4 +1091,23 @@ def delete_blog(request, blog_id):
         'blog': blog,
         'title': 'Delete Blog Post',
     }
-    return render(request, 'myapp/delete_blog.html', context) 
+    return render(request, 'myapp/delete_blog.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(is_admin, login_url='login')
+def delete_blog_comment(request, comment_id):
+    """Delete a blog comment (admin only)"""
+    comment = get_object_or_404(BlogComment, id=comment_id)
+    blog_id = comment.blog.id
+    
+    if request.method == 'POST':
+        comment.delete()
+        messages.success(request, 'Comment deleted successfully!')
+        return redirect('blog_detail', blog_id=blog_id)
+    
+    context = {
+        'comment': comment,
+        'blog': comment.blog,
+        'title': 'Delete Comment',
+    }
+    return render(request, 'myapp/delete_blog_comment.html', context) 

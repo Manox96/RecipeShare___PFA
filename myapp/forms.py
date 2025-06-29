@@ -122,8 +122,11 @@ class BlogForm(forms.ModelForm):
     tags = forms.CharField(
         max_length=255, 
         required=False,
-        help_text='Enter comma-separated tags.',
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        help_text='Enter comma-separated tags (e.g., Cooking, Tips, Healthy).',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter tags separated by commas...'
+        })
     )
 
     class Meta:
@@ -134,6 +137,30 @@ class BlogForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 10}),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # If we're editing an existing blog, populate the tags field
+        if self.instance and self.instance.pk:
+            existing_tags = self.instance.tags.all()
+            if existing_tags:
+                tag_names = [tag.name for tag in existing_tags]
+                self.fields['tags'].initial = ', '.join(tag_names)
+
+    def save(self, commit=True):
+        blog = super().save(commit=False)
+        if commit:
+            blog.save()
+            # Clear existing tags and add new ones
+            blog.tags.clear()
+            tag_names = self.cleaned_data.get('tags', '').strip()
+            if tag_names:
+                for tag_name in tag_names.split(','):
+                    tag_name = tag_name.strip()
+                    if tag_name:
+                        tag, created = Tag.objects.get_or_create(name=tag_name)
+                        blog.tags.add(tag)
+        return blog
 
 class BlogCommentForm(forms.ModelForm):
     class Meta:

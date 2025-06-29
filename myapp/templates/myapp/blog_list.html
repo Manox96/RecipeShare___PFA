@@ -214,7 +214,7 @@
         {% endif %}
         {% with blog.tags.all|first as first_tag %}
           {% if first_tag %}
-            <span class="blog-tag">{{ first_tag.name }}</span>
+            <span class="blog-tag">{{ first_tag.name|upper }}</span>
           {% endif %}
         {% endwith %}
       </div>
@@ -228,11 +228,14 @@
         <div class="blog-excerpt">
           {{ blog.content|truncatewords:30|striptags }}
         </div>
+        {% if blog.tags.all %}
         <div class="blog-tags">
+          <i class="bi bi-tags text-muted me-1"></i>
           {% for tag in blog.tags.all %}
             <span class="blog-tag-item">{{ tag.name }}</span>
           {% endfor %}
         </div>
+        {% endif %}
         <div class="read-more-btn">
           Read More <i class="bi bi-arrow-right"></i>
         </div>

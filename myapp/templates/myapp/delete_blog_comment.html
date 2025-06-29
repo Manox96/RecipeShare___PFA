@@ -1,0 +1,128 @@
+{% extends 'myapp/layout.html' %}
+
+{% block title %}Delete Comment - Admin Dashboard{% endblock %}
+
+{% block main_content %}
+<style>
+  .delete-comment-container {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60,60,120,0.10);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin: 2rem auto;
+  }
+  
+  .warning-icon {
+    font-size: 3rem;
+    color: #dc3545;
+    margin-bottom: 1rem;
+  }
+  
+  .comment-preview {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  
+  .comment-author {
+    font-weight: 600;
+    color: #18181b;
+    margin-bottom: 0.5rem;
+  }
+  
+  .comment-date {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  .comment-text {
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  .btn-danger {
+    background: #dc3545;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+  }
+  
+  .btn-secondary {
+    background: #6b7280;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-secondary:hover {
+    background: #4b5563;
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+</style>
+
+<div class="delete-comment-container">
+  <div class="text-center">
+    <div class="warning-icon">
+      <i class="bi bi-exclamation-triangle"></i>
+    </div>
+    <h2 class="mb-4">🗑️ Supprimer le Commentaire</h2>
+    <p class="text-muted mb-4">
+      Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action ne peut pas être annulée.
+    </p>
+  </div>
+  
+  <div class="comment-preview">
+    <div class="comment-author">
+      <i class="bi bi-person"></i> {{ comment.user.get_full_name|default:comment.user.username }}
+    </div>
+    <div class="comment-date">
+      <i class="bi bi-clock"></i> {{ comment.created_at|date:"F d, Y à H:i" }}
+    </div>
+    <div class="comment-text">
+      {{ comment.comment|linebreaks }}
+    </div>
+  </div>
+  
+  <div class="text-center">
+    <p class="text-muted">
+      <strong>Article:</strong> {{ blog.title }}
+    </p>
+  </div>
+  
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions justify-content-center">
+      <button type="submit" class="btn-danger">
+        <i class="bi bi-trash"></i> Confirmer la Suppression
+      </button>
+      <a href="{% url 'blog_detail' blog.id %}" class="btn-secondary">
+        <i class="bi bi-x-circle"></i> Annuler
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %} 

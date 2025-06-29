@@ -568,4 +568,4 @@ class Command(BaseCommand):
 
             self.stdout.write(self.style.SUCCESS(f'Created recipe: {recipe.title}'))
 
-        self.stdout.write(self.style.SUCCESS('Successfully seeded recipes')) 
+        self.stdout.write(self.style.SUCCESS('Successfully seeded recipes'))

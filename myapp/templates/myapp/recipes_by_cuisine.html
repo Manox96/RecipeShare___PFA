@@ -135,6 +135,7 @@
   <p class="text-center mb-5" style="color: #555; font-size: 1.15rem;">Discover delicious recipes from the {{ cuisine.name }} cuisine.</p>
   <div id="recipes-section" class="recipes-grid">
     {% for recipe in recipes %}
+    {% if recipe.is_public %}
       <div class="recipe-card">
         {% if recipe.image %}
           <img src="{{ recipe.image.url }}" class="recipe-img" alt="{{ recipe.title }}">
@@ -154,6 +155,7 @@
           </a>
         </div>
       </div>
+    {% endif %}
     {% empty %}
       <div class="col-12">
         <div class="text-center py-5">
