@@ -191,9 +191,20 @@ def create_recipe(request):
                 messages.error(request, f'Ingredient (General): {error}')
             # Add step formset errors
             for formset_form in step_formset:
-                for field, errors in formset_form.errors.items():
-                    for error in errors:
-                        messages.error(request, f'Step - {field.capitalize()}: {error}')
+                if formset_form.errors:
+                    # If there are ID validation errors, try to clean them up
+                    if 'id' in formset_form.errors:
+                        # Remove the invalid ID field from the form
+                        if 'id' in formset_form.data:
+                            del formset_form.data[formset_form.add_prefix('id')]
+                        # Mark this form for deletion if it's causing issues
+                        if 'DELETE' in formset_form.fields:
+                            formset_form.data[formset_form.add_prefix('DELETE')] = 'on'
+                    else:
+                        # Show other validation errors
+                        for field, errors in formset_form.errors.items():
+                            for error in errors:
+                                messages.error(request, f'Step - {field}: {error}')
             for error in step_formset.non_form_errors():
                 messages.error(request, f'Step (General): {error}')
     else:
@@ -349,53 +360,146 @@ def update_recipe(request, recipe_id):
         return redirect('recipe_detail', recipe_id=recipe_id)
         
     if request.method == 'POST':
-        form = RecipeForm(request.POST, request.FILES, instance=recipe)
-        ingredient_formset = RecipeIngredientFormSet(request.POST, instance=recipe, prefix='ingredients')
-        step_formset = StepFormSet(request.POST, instance=recipe, prefix='steps')
+        # Handle form submission manually since template uses manual form fields
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        difficulty_id = request.POST.get('difficulty')
+        cuisine_id = request.POST.get('cuisine')
+        meal_type_id = request.POST.get('meal_type')
+        servings = request.POST.get('servings')
+        prep_time = request.POST.get('prep_time')
+        cook_time = request.POST.get('cook_time')
+        is_public = request.POST.get('is_public') == 'on'
         
-        if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
-            form.save()
-            ingredient_formset.save()
-            step_formset.save()
-            messages.success(request, 'Recipe updated successfully!')
-            return redirect('recipe_detail', recipe_id=recipe.id)
+        # Validate required fields
+        errors = []
+        if not title:
+            errors.append('Recipe title is required.')
+        if not description:
+            errors.append('Recipe description is required.')
+        if not difficulty_id:
+            errors.append('Difficulty is required.')
+        if not meal_type_id:
+            errors.append('Meal type is required.')
+        if not servings or int(servings) < 1:
+            errors.append('Servings must be at least 1.')
+        if not prep_time or int(prep_time) < 1:
+            errors.append('Preparation time must be at least 1 minute.')
+        if not cook_time or int(cook_time) < 1:
+            errors.append('Cooking time must be at least 1 minute.')
+        
+        if errors:
+            for error in errors:
+                messages.error(request, error)
         else:
-            # Add form and formset errors to the context
-            context = {
-                'form': form,
-                'recipe': recipe,
-                'ingredient_formset': ingredient_formset,
-                'step_formset': step_formset,
-                'difficulties': Difficulty.objects.all(),
-                'cuisines': Cuisine.objects.all(),
-                'meal_types': MealType.objects.all(),
-                'ingredients': Ingredient.objects.all(),
-                'units': Unit.objects.all(),
-                'title': f'Update {recipe.title}'
-            }
-            # Manually add formset errors to messages for visibility
-            if not ingredient_formset.is_valid():
-                for formset_form in ingredient_formset:
-                    for field, errors in formset_form.errors.items():
-                        for error in errors:
-                            messages.error(request, f'Ingredient - {field}: {error}')
-                for error in ingredient_formset.non_form_errors():
-                     messages.error(request, f'Ingredient (General): {error}')
-            if not step_formset.is_valid():
-                 for formset_form in step_formset:
-                    for field, errors in formset_form.errors.items():
-                        for error in errors:
-                            messages.error(request, f'Step - {field}: {error}')
-                 for error in step_formset.non_form_errors():
-                     messages.error(request, f'Step (General): {error}')
-            return render(request, 'myapp/update_recipe.html', context)
-    else:
-        form = RecipeForm(instance=recipe)
-        ingredient_formset = RecipeIngredientFormSet(instance=recipe, prefix='ingredients')
-        step_formset = StepFormSet(instance=recipe, prefix='steps')
+            try:
+                # Update recipe fields
+                recipe.title = title
+                recipe.description = description
+                recipe.difficulty_id = difficulty_id
+                recipe.cuisine_id = cuisine_id if cuisine_id else None
+                recipe.meal_type_id = meal_type_id
+                recipe.servings = servings
+                recipe.prep_time = prep_time
+                recipe.cook_time = cook_time
+                recipe.is_public = is_public
+                
+                # Handle image upload
+                if 'image' in request.FILES:
+                    recipe.image = request.FILES['image']
+                
+                recipe.save()
+                
+                # Handle ingredients with better error handling
+                ingredient_formset = RecipeIngredientFormSet(request.POST, instance=recipe, prefix='ingredients')
+                
+                # Clean up the POST data to remove invalid ingredient IDs
+                post_data = request.POST.copy()
+                ingredient_prefix = 'ingredients-'
+                
+                # Find and clean up invalid ingredient IDs
+                for key in list(post_data.keys()):
+                    if key.startswith(ingredient_prefix) and key.endswith('-id'):
+                        ingredient_id = post_data.get(key)
+                        if ingredient_id and ingredient_id.strip():
+                            try:
+                                # Check if the ingredient ID exists in the database
+                                from myapp.models import RecipeIngredient
+                                if not RecipeIngredient.objects.filter(id=ingredient_id, recipe=recipe).exists():
+                                    # If the ingredient doesn't exist, remove the ID and mark for deletion
+                                    post_data[key] = ''
+                                    delete_key = key.replace('-id', '-DELETE')
+                                    post_data[delete_key] = 'on'
+                            except (ValueError, TypeError):
+                                # If the ID is not a valid integer, remove it
+                                post_data[key] = ''
+                
+                # Create a new formset with cleaned data
+                cleaned_ingredient_formset = RecipeIngredientFormSet(post_data, instance=recipe, prefix='ingredients')
+                
+                if cleaned_ingredient_formset.is_valid():
+                    cleaned_ingredient_formset.save()
+                else:
+                    # Show validation errors
+                    for formset_form in cleaned_ingredient_formset:
+                        for field, errors in formset_form.errors.items():
+                            for error in errors:
+                                if field != 'id':  # Skip ID errors as we've handled them
+                                    messages.error(request, f'Ingredient - {field}: {error}')
+                    for error in cleaned_ingredient_formset.non_form_errors():
+                        messages.error(request, f'Ingredient (General): {error}')
+                
+                # Handle steps with better error handling
+                step_formset = StepFormSet(request.POST, instance=recipe, prefix='steps')
+                
+                # Clean up the POST data to remove invalid step IDs
+                post_data = request.POST.copy()
+                step_prefix = 'steps-'
+                
+                # Find and clean up invalid step IDs
+                for key in list(post_data.keys()):
+                    if key.startswith(step_prefix) and key.endswith('-id'):
+                        step_id = post_data.get(key)
+                        if step_id and step_id.strip():
+                            try:
+                                # Check if the step ID exists in the database
+                                from myapp.models import Step
+                                if not Step.objects.filter(id=step_id, recipe=recipe).exists():
+                                    # If the step doesn't exist, remove the ID and mark for deletion
+                                    post_data[key] = ''
+                                    delete_key = key.replace('-id', '-DELETE')
+                                    post_data[delete_key] = 'on'
+                            except (ValueError, TypeError):
+                                # If the ID is not a valid integer, remove it
+                                post_data[key] = ''
+                
+                # Create a new formset with cleaned data
+                cleaned_step_formset = StepFormSet(post_data, instance=recipe, prefix='steps')
+                
+                if cleaned_step_formset.is_valid():
+                    cleaned_step_formset.save()
+                else:
+                    # Show validation errors
+                    for formset_form in cleaned_step_formset:
+                        for field, errors in formset_form.errors.items():
+                            for error in errors:
+                                if field != 'id':  # Skip ID errors as we've handled them
+                                    messages.error(request, f'Step - {field}: {error}')
+                    for error in cleaned_step_formset.non_form_errors():
+                        messages.error(request, f'Step (General): {error}')
+                
+                if not errors:
+                    messages.success(request, 'Recipe updated successfully!')
+                    return redirect('photo_list')
+                    
+            except Exception as e:
+                messages.error(request, f'Error updating recipe: {str(e)}')
+    
+    # GET request or form errors - prepare context
+    ingredient_formset = RecipeIngredientFormSet(instance=recipe, prefix='ingredients')
+    step_formset = StepFormSet(instance=recipe, prefix='steps')
     
     context = {
-        'form': form,
         'recipe': recipe,
         'ingredient_formset': ingredient_formset,
         'step_formset': step_formset,

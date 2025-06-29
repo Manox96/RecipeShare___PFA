@@ -8,6 +8,18 @@
                 <div class="card-body p-4">
                     <h2 class="card-title mb-4 text-center">Update Recipe: {{ recipe.title }}</h2>
                     
+                    <!-- Display Messages -->
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
                     <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         {% csrf_token %}
                         
@@ -82,6 +94,16 @@
                             </div>
                         </div>
 
+                        <!-- Recipe Visibility -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="id_is_public" name="is_public" {% if recipe.is_public %}checked{% endif %}>
+                                <label class="form-check-label" for="id_is_public">
+                                    Make this recipe public
+                                </label>
+                            </div>
+                        </div>
+
                         <!-- Ingredients Section -->
                         <div class="mb-4">
                             <h4 class="mb-3">Ingredients</h4>
@@ -133,10 +155,10 @@
                                         {{ form.id }}
                                         <div class="col-1 d-flex align-items-center justify-content-center">
                                             <span class="step-number h5">{{ forloop.counter }}</span>
-                                            <input type="hidden" class="form-control" name="{{ form.step_number.html_name }}" value="{{ form.instance.step_number|default:forloop.counter }}">
+                                            {{ form.step_number }}
                                         </div>
                                         <div class="col-md-9">
-                                            <textarea class="form-control" name="{{ form.instruction.html_name }}" rows="2" required>{{ form.instance.instruction }}</textarea>
+                                            {{ form.instruction }}
                                         </div>
                                         <div class="col-md-2 d-flex align-items-center">
                                             <button type="button" class="btn btn-danger remove-step w-100">Remove</button>
@@ -152,7 +174,7 @@
                                 {{ step_formset.empty_form.id }}
                                 <div class="col-1 d-flex align-items-center justify-content-center">
                                     <span class="step-number h5"></span>
-                                    {{ step_formset.empty_form.step_number.as_hidden }}
+                                    {{ step_formset.empty_form.step_number }}
                                 </div>
                                 <div class="col-md-9">{{ step_formset.empty_form.instruction }}</div>
                                 <div class="col-md-2 d-flex align-items-center">
@@ -251,6 +273,39 @@
     .btn-secondary:hover {
         background: #eee;
     }
+
+    .hidden {
+        display: none;
+    }
+
+    .messages {
+        position: relative;
+    }
+
+    .alert {
+        border-radius: 1rem;
+        border: none;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
 </style>
 
 <script>
@@ -261,16 +316,13 @@
         const addStepBtn = document.getElementById('add-step');
         const form = document.querySelector('form');
         const newIngredientModal = new bootstrap.Modal(document.getElementById('newIngredientModal'));
-        const newIngredientForm = document.getElementById('newIngredientForm');
         const saveNewIngredientBtn = document.getElementById('saveNewIngredient');
         let ingredientFormCount = document.querySelectorAll('.ingredient-form').length;
-        let stepFormCount = document.querySelectorAll('.step-form').length;
         const totalStepForms = document.getElementById('id_steps-TOTAL_FORMS');
 
         // Function to create new ingredient
         async function createNewIngredient(name) {
             try {
-                console.log('Attempting to create new ingredient:', name);
                 const response = await fetch('/ingredient/create/', {
                     method: 'POST',
                     headers: {
@@ -285,77 +337,39 @@
                 }
 
                 const data = await response.json();
-                console.log('Ingredient creation response data:', data);
                 
                 if (data.success) {
                     // Add the new ingredient to all ingredient selects
                     const ingredientSelects = document.querySelectorAll('select[name*="ingredient"]');
                     ingredientSelects.forEach(select => {
                         const option = new Option(data.ingredient.name, data.ingredient.id);
-                        // Check if the option already exists before adding
                         if (!Array.from(select.options).some(opt => opt.value == data.ingredient.id)) {
                             select.add(option);
                         }
                     });
                     
-                    // Show success message
-                    const messagesContainer = document.querySelector('.messages');
-                    if (messagesContainer) {
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                        alertDiv.innerHTML = `
-                            ${data.message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        `;
-                        messagesContainer.appendChild(alertDiv);
-                    }
-                    
                     // Close the modal and clear the input
                     const modalElement = document.getElementById('newIngredientModal');
                     const modal = bootstrap.Modal.getInstance(modalElement);
                     if (modal) {
-                         modal.hide();
-                    } else {
-                         console.error('Bootstrap modal instance not found.');
+                        modal.hide();
                     }
-                    document.getElementById('ingredientName').value = ''; // Clear input regardless
+                    document.getElementById('ingredientName').value = '';
                     
                     // Select the new ingredient in the last ingredient form
                     const lastIngredientForm = document.querySelector('.ingredient-form:last-child');
                     if (lastIngredientForm) {
                         const select = lastIngredientForm.querySelector('select[name*="ingredient"]');
                         if (select) {
-                             select.value = data.ingredient.id;
+                            select.value = data.ingredient.id;
                         }
                     }
                 } else {
-                     // Handle backend reported errors
-                     const errorMessage = data.message || 'An unknown error occurred on the server.';
-                     console.error('Backend reported error:', errorMessage);
-                     const messagesContainer = document.querySelector('.messages');
-                     if (messagesContainer) {
-                         const alertDiv = document.createElement('div');
-                         alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-                         alertDiv.innerHTML = `
-                             ${errorMessage}
-                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                         `;
-                         messagesContainer.appendChild(alertDiv);
-                     }
+                    alert(data.message || 'An error occurred while creating the ingredient.');
                 }
             } catch (error) {
-                // Handle network or other errors
                 console.error('Error creating ingredient:', error);
-                const messagesContainer = document.querySelector('.messages');
-                if (messagesContainer) {
-                    const alertDiv = document.createElement('div');
-                    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-                    alertDiv.innerHTML = `
-                        An error occurred: ${error.message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    `;
-                    messagesContainer.appendChild(alertDiv);
-                }
+                alert('An error occurred while creating the ingredient.');
             }
         }
 
@@ -376,6 +390,7 @@
         // Add event listener for modal hidden event
         document.getElementById('newIngredientModal').addEventListener('hidden.bs.modal', function () {
             document.getElementById('ingredientName').value = '';
+            document.getElementById('ingredientName').classList.remove('is-invalid');
         });
 
         // Add new ingredient form
@@ -386,12 +401,14 @@
             newForm.innerHTML = newForm.innerHTML.replace(formRegex, `ingredients-${ingredientFormCount}-`);
             // Clear the values
             newForm.querySelectorAll('select, input').forEach(input => {
-                if (input.type === 'text') {
+                if (input.type === 'text' || input.type === 'number') {
                     input.value = '';
                 } else if (input.tagName === 'SELECT') {
                     input.selectedIndex = 0;
                 }
             });
+            // Show the form if it was hidden
+            newForm.style.display = 'flex';
             ingredientsContainer.appendChild(newForm);
             updateFormIndexes();
         });
@@ -408,7 +425,6 @@
                     }
                     // Hide the form instead of removing it, so its data is still submitted
                     formToRemove.style.display = 'none';
-                    // updateFormIndexes(); // No need to re-index if just hiding
                 }
             }
         });
@@ -438,10 +454,17 @@
         function updateStepNumbers() {
             const stepForms = stepsContainer.querySelectorAll('.step-form');
             stepForms.forEach((form, index) => {
-                const stepNumberInput = form.querySelector('input[type="hidden"]');
-                if (stepNumberInput) stepNumberInput.value = index + 1;
+                // Update the step number input field
+                const stepNumberInput = form.querySelector('input[name*="step_number"]');
+                if (stepNumberInput) {
+                    stepNumberInput.value = index + 1;
+                }
+                
+                // Update the display number
                 const stepNumberDisplay = form.querySelector('.step-number');
-                if (stepNumberDisplay) stepNumberDisplay.textContent = index + 1;
+                if (stepNumberDisplay) {
+                    stepNumberDisplay.textContent = index + 1;
+                }
             });
         }
 
@@ -449,6 +472,19 @@
             let formIdx = parseInt(totalStepForms.value);
             const newForm = document.getElementById('empty-step-form').firstElementChild.cloneNode(true);
             newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, formIdx);
+            
+            // Set the step number for the new form
+            const stepNumberInput = newForm.querySelector('input[name*="step_number"]');
+            if (stepNumberInput) {
+                stepNumberInput.value = formIdx + 1;
+            }
+            
+            // Set the display number
+            const stepNumberDisplay = newForm.querySelector('.step-number');
+            if (stepNumberDisplay) {
+                stepNumberDisplay.textContent = formIdx + 1;
+            }
+            
             stepsContainer.appendChild(newForm);
             totalStepForms.value = formIdx + 1;
             updateStepNumbers();
@@ -483,26 +519,28 @@
             // Validate ingredients
             let ingredientsValid = true;
             document.querySelectorAll('.ingredient-form').forEach(ingredient => {
-                const selects = ingredient.querySelectorAll('select');
-                const inputs = ingredient.querySelectorAll('input');
-                
-                selects.forEach(select => {
-                    if (!select.value) {
-                        select.classList.add('is-invalid');
-                        ingredientsValid = false;
-                    } else {
-                        select.classList.remove('is-invalid');
-                    }
-                });
-                
-                inputs.forEach(input => {
-                    if (!input.value) {
-                        input.classList.add('is-invalid');
-                        ingredientsValid = false;
-                    } else {
-                        input.classList.remove('is-invalid');
-                    }
-                });
+                if (ingredient.style.display !== 'none') {
+                    const selects = ingredient.querySelectorAll('select');
+                    const inputs = ingredient.querySelectorAll('input[type="text"], input[type="number"]');
+                    
+                    selects.forEach(select => {
+                        if (!select.value) {
+                            select.classList.add('is-invalid');
+                            ingredientsValid = false;
+                        } else {
+                            select.classList.remove('is-invalid');
+                        }
+                    });
+                    
+                    inputs.forEach(input => {
+                        if (!input.value) {
+                            input.classList.add('is-invalid');
+                            ingredientsValid = false;
+                        } else {
+                            input.classList.remove('is-invalid');
+                        }
+                    });
+                }
             });
             
             if (!ingredientsValid) {
@@ -510,22 +548,8 @@
                 return;
             }
             
-            // Validate steps
-            let stepsValid = true;
-            document.querySelectorAll('.step-form').forEach(step => {
-                const textarea = step.querySelector('textarea');
-                if (!textarea.value.trim()) {
-                    textarea.classList.add('is-invalid');
-                    stepsValid = false;
-                } else {
-                    textarea.classList.remove('is-invalid');
-                }
-            });
-            
-            if (!stepsValid) {
-                alert('Please fill in all step instructions.');
-                return;
-            }
+            // Skip step validation on client side - let server handle it
+            // This prevents issues with formset empty forms
             
             // If everything is valid, submit the form
             const submitBtn = form.querySelector('button[type="submit"]');

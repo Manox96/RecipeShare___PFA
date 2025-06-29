@@ -1,0 +1,289 @@
+# 🍳 RECIPE SHARING APP - TEST DATA SAMPLES
+# Copy and paste these samples to test your application
+
+## 📝 RECIPE TITLES
+
+### Breakfast Recipes
+- Omelette aux Herbes Fraîches
+- Pancakes à la Banane et Chocolat
+- Smoothie Bowl Tropical
+- Pain Perdu à la Cannelle
+- Granola Maison aux Fruits Secs
+- Oeufs Bénédicte
+- Chia Pudding aux Baies
+- French Toast aux Pommes
+
+### Lunch Recipes
+- Salade César Classique
+- Quiche Lorraine Traditionnelle
+- Sandwich Club Triple
+- Soupe à l'Oignon Gratinée
+- Wrap Végétarien au Hummus
+- Pasta Carbonara Authentique
+- Burger Gourmet au Fromage
+- Risotto aux Champignons
+
+### Dinner Recipes
+- Coq au Vin Traditionnel
+- Filet de Bœuf Rossini
+- Paella Valenciana
+- Ratatouille Niçoise
+- Poulet Rôti aux Herbes
+- Poisson en Papillote
+- Lasagnes Bolognaises
+- Tajine d'Agneau aux Pruneaux
+
+### Desserts
+- Tarte Tatin aux Pommes
+- Crème Brûlée Vanille
+- Mousse au Chocolat Noir
+- Tiramisu Classique
+- Éclairs au Café
+- Macarons Parisiens
+- Profiteroles au Chocolat
+- Soufflé au Grand Marnier
+
+## 🥘 INGREDIENTS SAMPLES
+
+### Dairy & Eggs
+- 2 œufs frais
+- 200g de beurre doux
+- 150ml de crème fraîche
+- 100g de fromage râpé
+- 1 tasse de lait entier
+- 50g de parmesan
+- 3 cuillères à soupe de yaourt grec
+
+### Meats & Fish
+- 500g de filet de poulet
+- 300g de bœuf haché
+- 2 filets de saumon
+- 400g d'agneau en morceaux
+- 200g de jambon de Parme
+- 1 poulet entier
+- 300g de crevettes
+
+### Vegetables
+- 2 oignons moyens
+- 3 gousses d'ail
+- 4 tomates mûres
+- 2 courgettes
+- 1 aubergine
+- 500g de pommes de terre
+- 200g de champignons
+- 1 poivron rouge
+
+### Herbs & Spices
+- Sel et poivre au goût
+- 2 cuillères à soupe d'huile d'olive
+- 1 bouquet de persil frais
+- 1 cuillère à café de thym séché
+- 1 pincée de safran
+- 2 feuilles de laurier
+- 1 cuillère à café de paprika
+
+### Grains & Flours
+- 200g de farine tout usage
+- 100g de riz arborio
+- 300g de pâtes fraîches
+- 150g de semoule
+- 100g de farine de blé complet
+- 200g de quinoa
+
+## 📋 RECIPE INSTRUCTIONS SAMPLES
+
+### Simple Recipe Instructions
+1. Préchauffer le four à 180°C (350°F)
+2. Dans un grand bol, mélanger la farine, le sel et le sucre
+3. Ajouter les œufs un par un en mélangeant bien
+4. Incorporer le lait progressivement
+5. Laisser reposer la pâte 30 minutes
+6. Cuire au four pendant 25-30 minutes
+7. Laisser refroidir avant de servir
+
+### Detailed Recipe Instructions
+1. **Préparation des ingrédients** : Éplucher et émincer finement l'oignon et l'ail. Couper les légumes en morceaux réguliers.
+
+2. **Cuisson de base** : Dans une cocotte, faire chauffer l'huile d'olive à feu moyen. Ajouter l'oignon et l'ail, faire revenir 5 minutes jusqu'à ce qu'ils soient translucides.
+
+3. **Ajout des ingrédients principaux** : Incorporer la viande et la faire dorer sur toutes les faces pendant 8-10 minutes. Assaisonner avec sel et poivre.
+
+4. **Légumes et aromates** : Ajouter les légumes et les herbes. Remuer délicatement pour ne pas casser les légumes.
+
+5. **Liquide de cuisson** : Verser le bouillon chaud et porter à ébullition. Réduire le feu et laisser mijoter à couvert pendant 45 minutes.
+
+6. **Finalisation** : Retirer le couvercle et laisser réduire le liquide pendant 10 minutes. Rectifier l'assaisonnement si nécessaire.
+
+7. **Service** : Parsemer de persil frais haché et servir chaud avec du pain frais.
+
+## 🏷️ TAGS SAMPLES
+
+### Cuisine Types
+- Cuisine française
+- Cuisine italienne
+- Cuisine méditerranéenne
+- Cuisine asiatique
+- Cuisine mexicaine
+- Cuisine indienne
+- Cuisine japonaise
+- Cuisine marocaine
+
+### Dietary Tags
+- Végétarien
+- Vegan
+- Sans gluten
+- Faible en calories
+- Riche en protéines
+- Sans lactose
+- Keto-friendly
+- Paléo
+
+### Meal Types
+- Petit-déjeuner
+- Déjeuner
+- Dîner
+- Dessert
+- Apéritif
+- Collation
+- Brunch
+- Goûter
+
+### Difficulty Levels
+- Facile
+- Moyen
+- Difficile
+
+## 📝 BLOG POST SAMPLES
+
+### Blog Titles
+- "Les Secrets de la Cuisine Française Traditionnelle"
+- "Comment Réussir ses Pâtes à la Perfection"
+- "Guide Complet des Épices en Cuisine"
+- "Techniques de Base pour Débutants"
+- "Recettes Végétariennes Gourmandes"
+- "L'Art de la Pâtisserie Française"
+- "Cuisine du Monde : Voyage Culinaire"
+- "Conseils pour une Cuisine Équilibrée"
+
+### Blog Content Samples
+
+**Short Blog Post:**
+La cuisine française est reconnue dans le monde entier pour sa finesse et sa sophistication. Découvrez les techniques de base qui font la réputation de notre gastronomie, de la préparation des fonds de sauce aux méthodes de cuisson traditionnelles.
+
+**Medium Blog Post:**
+La réussite d'un plat dépend souvent de la qualité des ingrédients et de la technique utilisée. Dans cet article, nous allons explorer les fondamentaux de la cuisine française, en commençant par les techniques de base essentielles.
+
+La première étape consiste à maîtriser les différents types de coupes de légumes : la julienne pour les légumes en bâtonnets fins, la brunoise pour les petits dés, et la mirepoix pour les légumes en dés moyens. Ces techniques permettent non seulement une cuisson uniforme, mais aussi une présentation élégante.
+
+Ensuite, l'apprentissage des fonds de sauce est crucial. Le fond blanc, préparé avec des os de volaille et des légumes, sert de base à de nombreuses sauces classiques. Le fond brun, obtenu par caramélisation des os et légumes, apporte une saveur plus prononcée.
+
+**Long Blog Post:**
+La gastronomie française représente un patrimoine culturel unique, reconnu par l'UNESCO comme patrimoine immatériel de l'humanité. Cette reconnaissance témoigne de l'importance de notre cuisine dans l'histoire culinaire mondiale.
+
+L'histoire de la cuisine française remonte au Moyen Âge, époque où les banquets royaux et seigneuriaux mettaient en valeur des techniques culinaires sophistiquées. Les cuisiniers de l'époque développaient des recettes complexes, utilisant des épices rares et des techniques de conservation innovantes.
+
+Au fil des siècles, la cuisine française s'est enrichie d'influences diverses. L'arrivée de nouveaux ingrédients d'Amérique, comme la tomate et la pomme de terre, a révolutionné nos habitudes culinaires. Les échanges commerciaux avec l'Asie ont introduit des épices exotiques qui ont enrichi notre palette gustative.
+
+Les techniques de base de la cuisine française reposent sur quelques principes fondamentaux. La maîtrise des coupes de légumes est essentielle : la julienne pour les légumes en bâtonnets fins, la brunoise pour les petits dés, et la mirepoix pour les légumes en dés moyens. Ces techniques permettent une cuisson uniforme et une présentation élégante.
+
+Les fonds de sauce constituent la base de nombreuses préparations. Le fond blanc, préparé avec des os de volaille et des légumes, sert de base aux sauces blanches classiques. Le fond brun, obtenu par caramélisation des os et légumes, apporte une saveur plus prononcée aux sauces brunes.
+
+La technique du roux, mélange de farine et de matière grasse, est fondamentale pour lier les sauces. Le roux blanc, blond ou brun, selon le temps de cuisson, donne des résultats différents en termes de saveur et de couleur.
+
+## 💬 COMMENT SAMPLES
+
+### Positive Comments
+- "Excellente recette ! J'ai adoré la combinaison des saveurs."
+- "Merci pour ce partage, c'est devenu un classique chez nous."
+- "Recette simple et délicieuse, parfaite pour les débutants."
+- "J'ai modifié légèrement les épices et c'était parfait !"
+- "Super article, très instructif et bien expliqué."
+
+### Constructive Comments
+- "Très bonne recette, mais j'aurais aimé plus de détails sur le temps de cuisson."
+- "Délicieux ! J'ai ajouté un peu plus d'ail et c'était parfait."
+- "Recette intéressante, mais un peu trop salée à mon goût."
+- "Merci pour les conseils, très utile pour un débutant comme moi."
+- "J'ai essayé avec des légumes de saison, résultat excellent !"
+
+## 🏷️ CUISINE NAMES WITH COUNTRY CODES
+
+### European Cuisines
+- Cuisine française (FR)
+- Cuisine italienne (IT)
+- Cuisine espagnole (ES)
+- Cuisine grecque (GR)
+- Cuisine allemande (DE)
+- Cuisine portugaise (PT)
+- Cuisine belge (BE)
+- Cuisine suisse (CH)
+
+### Asian Cuisines
+- Cuisine japonaise (JP)
+- Cuisine chinoise (CN)
+- Cuisine thaïlandaise (TH)
+- Cuisine indienne (IN)
+- Cuisine vietnamienne (VN)
+- Cuisine coréenne (KR)
+- Cuisine indonésienne (ID)
+- Cuisine malaisienne (MY)
+
+### American Cuisines
+- Cuisine mexicaine (MX)
+- Cuisine américaine (US)
+- Cuisine brésilienne (BR)
+- Cuisine péruvienne (PE)
+- Cuisine argentine (AR)
+- Cuisine canadienne (CA)
+
+### African & Middle Eastern
+- Cuisine marocaine (MA)
+- Cuisine libanaise (LB)
+- Cuisine éthiopienne (ET)
+- Cuisine tunisienne (TN)
+- Cuisine turque (TR)
+- Cuisine égyptienne (EG)
+
+## 📊 STATISTICS SAMPLES
+
+### Recipe Statistics
+- Temps de préparation: 15 minutes
+- Temps de cuisson: 30 minutes
+- Temps total: 45 minutes
+- Portions: 4 personnes
+- Difficulté: Facile
+- Calories par portion: 350 kcal
+- Protéines: 25g
+- Glucides: 45g
+- Lipides: 12g
+
+### User Statistics
+- Nombre de vues: 1,247
+- Nombre de favoris: 89
+- Note moyenne: 4.8/5
+- Nombre de commentaires: 23
+- Date de création: 15 mars 2024
+- Dernière modification: 22 mars 2024
+
+## 🎯 USAGE INSTRUCTIONS
+
+### Pour tester les recettes:
+1. Copiez le titre d'une recette
+2. Ajoutez les ingrédients listés
+3. Utilisez les instructions détaillées
+4. Ajoutez les tags appropriés
+5. Sélectionnez la cuisine correspondante
+
+### Pour tester les blogs:
+1. Copiez un titre de blog
+2. Utilisez le contenu d'exemple
+3. Ajoutez des tags pertinents
+4. Testez les commentaires
+
+### Pour tester les commentaires:
+1. Utilisez les exemples de commentaires fournis
+2. Testez les fonctionnalités de modération admin
+
+---
+# 🎉 BON TESTING !
+# Utilisez ces échantillons pour tester toutes les fonctionnalités de votre application Recipe Share 
