@@ -1,0 +1,212 @@
+# 🍳 PLATEA - FORM TEST DATA
+# Copy and paste these samples to test your application forms
+
+## 📝 RECIPE FORM TEST DATA
+
+### Recipe Basic Information
+**Title:** Coq au Vin Traditionnel
+**Description:** Un plat français classique avec du poulet mijoté dans du vin rouge, des lardons et des champignons. Une recette authentique qui réchauffe le cœur.
+**Difficulty:** Moyen
+**Prep Time:** 30
+**Cook Time:** 90
+**Servings:** 6
+**Cuisine:** Cuisine française
+**Meal Type:** Dîner
+**Tags:** Plats traditionnels, Cuisine française, Poulet, Vin rouge
+**Public:** ✓
+
+### Recipe Ingredients
+**Ingredient 1:** Poulet fermier (500g)
+**Unit 1:** grammes
+**Quantity 1:** 500
+
+**Ingredient 2:** Vin rouge
+**Unit 2:** millilitres
+**Quantity 2:** 750
+
+**Ingredient 3:** Lardons fumés
+**Unit 3:** grammes
+**Quantity 3:** 200
+
+**Ingredient 4:** Champignons de Paris
+**Unit 4:** grammes
+**Quantity 4:** 300
+
+**Ingredient 5:** Oignons
+**Unit 5:** unités
+**Quantity 5:** 2
+
+**Ingredient 6:** Carottes
+**Unit 6:** unités
+**Quantity 6:** 3
+
+**Ingredient 7:** Ail
+**Unit 7:** gousses
+**Quantity 7:** 4
+
+**Ingredient 8:** Bouillon de volaille
+**Unit 8:** millilitres
+**Quantity 8:** 500
+
+**Ingredient 9:** Beurre
+**Unit 9:** grammes
+**Quantity 9:** 50
+
+**Ingredient 10:** Farine
+**Unit 10:** cuillères à soupe
+**Quantity 10:** 2
+
+### Recipe Steps
+**Step 1:** Couper le poulet en morceaux et les faire revenir dans le beurre jusqu'à ce qu'ils soient dorés. Réserver.
+
+**Step 2:** Dans la même cocotte, faire revenir les lardons, puis ajouter les oignons émincés et l'ail haché. Faire revenir 5 minutes.
+
+**Step 3:** Remettre les morceaux de poulet dans la cocotte, ajouter le vin rouge et le bouillon. Porter à ébullition.
+
+**Step 4:** Ajouter les carottes coupées en rondelles et les champignons. Assaisonner avec sel et poivre.
+
+**Step 5:** Laisser mijoter à feu doux pendant 1h30, en remuant de temps en temps.
+
+**Step 6:** 10 minutes avant la fin, délayer la farine dans un peu de bouillon froid et l'ajouter pour lier la sauce.
+
+**Step 7:** Servir chaud avec des pommes de terre vapeur ou du riz.
+
+---
+
+## 📝 BLOG FORM TEST DATA
+
+### Blog Post Information
+**Title:** Les Secrets de la Cuisine Française Traditionnelle
+**Content:** La cuisine française est reconnue dans le monde entier pour sa finesse et sa sophistication. Découvrez les techniques de base qui font la réputation de notre gastronomie, de la préparation des fonds de sauce aux méthodes de cuisson traditionnelles.
+
+L'histoire de la cuisine française remonte au Moyen Âge, époque où les banquets royaux et seigneuriaux mettaient en valeur des techniques culinaires sophistiquées. Les cuisiniers de l'époque développaient des recettes complexes, utilisant des épices rares et des techniques de conservation innovantes.
+
+Au fil des siècles, la cuisine française s'est enrichie d'influences diverses. L'arrivée de nouveaux ingrédients d'Amérique, comme la tomate et la pomme de terre, a révolutionné nos habitudes culinaires. Les échanges commerciaux avec l'Asie ont introduit des épices exotiques qui ont enrichi notre palette gustative.
+
+Les techniques de base de la cuisine française reposent sur quelques principes fondamentaux. La maîtrise des coupes de légumes est essentielle : la julienne pour les légumes en bâtonnets fins, la brunoise pour les petits dés, et la mirepoix pour les légumes en dés moyens. Ces techniques permettent une cuisson uniforme et une présentation élégante.
+
+Les fonds de sauce constituent la base de nombreuses préparations. Le fond blanc, préparé avec des os de volaille et des légumes, sert de base aux sauces blanches classiques. Le fond brun, obtenu par caramélisation des os et légumes, apporte une saveur plus prononcée aux sauces brunes.
+
+La technique du roux, mélange de farine et de matière grasse, est fondamentale pour lier les sauces. Le roux blanc, blond ou brun, selon le temps de cuisson, donne des résultats différents en termes de saveur et de couleur.
+
+**Tags:** Cuisine française, Techniques culinaires, Gastronomie, Traditions
+
+---
+
+## 📝 CONTACT FORM TEST DATA
+
+### Contact Information
+**Name:** Jean Dupont
+**Email:** jean.dupont@email.com
+**Subject:** Demande d'information sur les cours de cuisine
+**Message:** Bonjour, je suis intéressé par vos cours de cuisine française. Pouvez-vous me donner plus d'informations sur les horaires et les tarifs ? Je suis débutant et j'aimerais apprendre les bases de la cuisine traditionnelle. Merci d'avance pour votre réponse.
+
+---
+
+## 📝 BLOG COMMENT TEST DATA
+
+### Comment Samples
+**Comment 1:** Excellente recette ! J'ai adoré la combinaison des saveurs. Le temps de cuisson était parfait et le résultat était délicieux. Je recommande vivement !
+
+**Comment 2:** Merci pour ce partage, c'est devenu un classique chez nous. J'ai juste ajouté un peu plus d'ail et c'était parfait. À refaire !
+
+**Comment 3:** Recette simple et délicieuse, parfaite pour les débutants. Les instructions sont claires et le résultat est au rendez-vous. Merci !
+
+**Comment 4:** Très bonne recette, mais j'aurais aimé plus de détails sur le temps de cuisson. Sinon c'était excellent !
+
+**Comment 5:** Super article, très instructif et bien expliqué. J'ai appris beaucoup de techniques que je vais pouvoir appliquer dans ma cuisine quotidienne.
+
+---
+
+## 📝 PHOTO UPLOAD FORM TEST DATA
+
+### Photo Information
+**Nom:** Mon plat signature
+**Description:** Une photo de mon plat préféré que j'ai préparé pour un dîner spécial
+**Image:** [Upload file]
+
+---
+
+## 📝 PROFILE FORM TEST DATA
+
+### Profile Information
+**Email:** utilisateur@email.com
+**New Password:** NouveauMotDePasse123!
+**Confirm New Password:** NouveauMotDePasse123!
+**Avatar:** [Upload file]
+
+---
+
+## 🎯 USAGE INSTRUCTIONS
+
+### Pour tester les recettes:
+1. Copiez le titre de la recette
+2. Ajoutez la description
+3. Sélectionnez la difficulté, temps de préparation et cuisson
+4. Choisissez la cuisine et le type de repas
+5. Ajoutez les ingrédients un par un
+6. Rédigez les étapes de cuisson
+7. Ajoutez les tags appropriés
+
+### Pour tester les blogs:
+1. Copiez le titre du blog
+2. Utilisez le contenu d'exemple
+3. Ajoutez des tags pertinents
+4. Testez les commentaires
+
+### Pour tester le formulaire de contact:
+1. Utilisez les informations d'exemple
+2. Testez la validation des champs
+
+### Pour tester les commentaires:
+1. Utilisez les exemples de commentaires fournis
+2. Testez les fonctionnalités de modération admin
+
+---
+
+## 🔧 INGRÉDIENTS À CRÉER (si pas existants)
+
+### Ingrédients de base
+- Poulet fermier
+- Vin rouge
+- Lardons fumés
+- Champignons de Paris
+- Oignons
+- Carottes
+- Ail
+- Bouillon de volaille
+- Beurre
+- Farine
+- Sel
+- Poivre
+
+### Unités de mesure
+- grammes
+- millilitres
+- unités
+- gousses
+- cuillères à soupe
+- cuillères à café
+- tasses
+- pincées
+
+---
+
+## 🏷️ TAGS À CRÉER (si pas existants)
+
+### Tags culinaires
+- Plats traditionnels
+- Cuisine française
+- Poulet
+- Vin rouge
+- Techniques culinaires
+- Gastronomie
+- Traditions
+- Recettes faciles
+- Cuisine du monde
+- Végétarien
+
+---
+
+# 🎉 BON TESTING !
+# Utilisez ces échantillons pour tester toutes les fonctionnalités de votre application Platea 

@@ -79,7 +79,7 @@ def main_page(request):
     popular_recipes = Recipe.objects.filter(is_public=True).exclude(is_public=False).order_by('-created_at')[:4]
     
     # Get newly added recipes (last 3 days) - only public ones
-    three_days_ago = timezone.now() - datetime.timedelta(days=300)
+    three_days_ago = timezone.now() - datetime.timedelta(days=30)
     new_recipes = Recipe.objects.filter(
         is_public=True, 
         created_at__gte=three_days_ago
@@ -706,18 +706,40 @@ def create_tag(request):
 
 def recipes_by_cuisine(request, cuisine_id):
     from django.core.paginator import Paginator
+    from django.db.models import Q
+    
     cuisine = get_object_or_404(Cuisine, id=cuisine_id)
-    # More explicit filtering: exclude private recipes and ensure is_public is True
+    
+    # Get search query from request
+    search_query = request.GET.get('search', '')
+    
+    # Start with recipes from this cuisine
     recipes = Recipe.objects.filter(
         is_public=True, 
         cuisine=cuisine
-    ).exclude(is_public=False).order_by('-created_at')
+    ).exclude(is_public=False)
+    
+    # Apply search filter if query exists
+    if search_query:
+        recipes = recipes.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(ingredients__ingredient__name__icontains=search_query) |
+            Q(tags__name__icontains=search_query)
+        ).distinct()
+    
+    # Order by creation date
+    recipes = recipes.order_by('-created_at')
+    
+    # Pagination
     paginator = Paginator(recipes, 9)  # Show 9 recipes per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    
     context = {
         'cuisine': cuisine,
         'recipes': page_obj,
+        'search_query': search_query,
         'title': f"{cuisine.name} Recipes",
     }
     return render(request, 'myapp/recipes_by_cuisine.html', context)

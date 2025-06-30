@@ -846,7 +846,6 @@
 
 <div id="recipes-section" class="recipes-grid">
   {% for recipe in recipes %}
-  {% if recipe.is_public %}
   <div class="recipe-card">
     {% if recipe.image %}
     <img src="{{ recipe.image.url }}" class="recipe-img" alt="{{ recipe.title }}">
@@ -866,7 +865,6 @@
       </a>
     </div>
   </div>
-  {% endif %}
   {% empty %}
   <div class="col-12">
     <div class="text-center py-5">
@@ -989,7 +987,6 @@
   <h2 class="mb-4 text-center" style="font-weight: 800; color: #18181b;">Newly Added Recipes</h2>
   <div class="row justify-content-center">
     {% for recipe in new_recipes %}
-    {% if recipe.is_public %}
     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
       <div class="card h-100 shadow-sm" style="border-radius: 1.2rem; overflow: hidden;">
         {% if recipe.image %}
@@ -1002,7 +999,6 @@
         </div>
       </div>
     </div>
-    {% endif %}
     {% endfor %}
   </div>
 </section>

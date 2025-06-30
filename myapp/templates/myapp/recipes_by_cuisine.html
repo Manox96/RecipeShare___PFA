@@ -124,6 +124,97 @@
       font-size: 0.95rem;
     }
   }
+  
+  /* Search form styles */
+  .search-section {
+    background: #fff;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 16px 0 rgba(60,60,120,0.08);
+  }
+  
+  .search-form {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .search-input {
+    flex: 1;
+    min-width: 300px;
+    padding: 0.8rem 1.2rem;
+    border: 2px solid #eee;
+    border-radius: 1rem;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #f7b32b;
+    box-shadow: 0 0 0 3px rgba(247,179,43,0.1);
+  }
+  
+  .search-btn {
+    background: linear-gradient(135deg, #f7b32b 0%, #ff8c42 100%);
+    color: #fff;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .search-btn:hover {
+    background: linear-gradient(135deg, #18181b 0%, #333 100%);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+  
+  .clear-search-btn {
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .clear-search-btn:hover {
+    background: #5a6268;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+  
+  .search-results-info {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #666;
+    font-size: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    .search-form {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .search-input {
+      min-width: auto;
+    }
+  }
 </style>
 <div class="container py-5">
   <h1 class="mb-4 text-center" style="font-weight: 800; color: #f7b32b;">
@@ -133,6 +224,40 @@
     {{ cuisine.name }} Recipes
   </h1>
   <p class="text-center mb-5" style="color: #555; font-size: 1.15rem;">Discover delicious recipes from the {{ cuisine.name }} cuisine.</p>
+  
+  <!-- Search Section -->
+  <div class="search-section">
+    <form method="GET" class="search-form">
+      <input 
+        type="text" 
+        name="search" 
+        class="search-input" 
+        placeholder="Search {{ cuisine.name }} recipes by title, description, ingredients, or tags..."
+        value="{{ search_query }}"
+      >
+      <button type="submit" class="search-btn">
+        <i class="bi bi-search"></i> Search
+      </button>
+      {% if search_query %}
+        <a href="{% url 'recipes_by_cuisine' cuisine_id=cuisine.id %}" class="clear-search-btn">
+          <i class="bi bi-x-circle"></i> Clear
+        </a>
+      {% endif %}
+    </form>
+    
+    {% if search_query %}
+      <div class="search-results-info">
+        <i class="bi bi-search"></i> 
+        Search results for "{{ search_query }}" in {{ cuisine.name }} recipes
+        {% if recipes %}
+          - Found {{ recipes.paginator.count }} recipe{{ recipes.paginator.count|pluralize }}
+        {% else %}
+          - No recipes found
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+  
   <div id="recipes-section" class="recipes-grid">
     {% for recipe in recipes %}
     {% if recipe.is_public %}
@@ -160,7 +285,12 @@
       <div class="col-12">
         <div class="text-center py-5">
           <i class="bi bi-emoji-smile text-muted" style="font-size: 3rem;"></i>
-          <p class="text-muted mt-3">No recipes found for this cuisine yet.</p>
+          {% if search_query %}
+            <p class="text-muted mt-3">No {{ cuisine.name }} recipes found matching "{{ search_query }}".</p>
+            <p class="text-muted">Try different keywords or <a href="{% url 'recipes_by_cuisine' cuisine_id=cuisine.id %}" style="color: #f7b32b;">clear the search</a> to see all {{ cuisine.name }} recipes.</p>
+          {% else %}
+            <p class="text-muted mt-3">No recipes found for this cuisine yet.</p>
+          {% endif %}
         </div>
       </div>
     {% endfor %}
@@ -172,7 +302,7 @@
       <ul class="pagination justify-content-center custom-pagination">
         {% if recipes.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ recipes.previous_page_number }}#recipes-section" aria-label="Previous">
+            <a class="page-link" href="?page={{ recipes.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}#recipes-section" aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
@@ -186,13 +316,13 @@
           {% if recipes.number == num %}
             <li class="page-item active"><span class="page-link">{{ num }}</span></li>
           {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{ num }}#recipes-section">{{ num }}</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}#recipes-section">{{ num }}</a></li>
           {% endif %}
         {% endfor %}
 
         {% if recipes.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ recipes.next_page_number }}#recipes-section" aria-label="Next">
+            <a class="page-link" href="?page={{ recipes.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}#recipes-section" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
